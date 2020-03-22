@@ -14,16 +14,16 @@ import DemoServer
 
 var testServer = DemoServer()
 
-class ServerBindingTests: XCTestCase {
-  
+class TestClass {
   @ServerBinding(server: testServer)
   var testData = TestData(id: "1", name: "1")
-  
+}
+
+class ServerBindingTests: XCTestCase {
   func testSetter() {
-    // This is an example of a functional test case.
-    // Use XCTAssert and related functions to verify your tests produce the correct results.
-    let newName = "one"
-    testServer.set(TestData(id: testData.id, name: newName))
-    XCTAssert(testData.name == newName)
+    let testClass = TestClass()
+    XCTAssert(testClass.testData.name == "1")
+    testServer.set(TestData(id: testClass.testData.id, name: "one"))
+    XCTAssert(testClass.testData.name == "one")
   }
 }

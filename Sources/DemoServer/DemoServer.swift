@@ -24,6 +24,8 @@ class DemoBindingHandler: BindingHandler {
     server?.bindingHandlers.remove(self)
   }
   
+  var observedIds: [Id] = []
+  
   deinit {
     remove()
   }
@@ -42,14 +44,7 @@ extension DemoBindingHandler: Hashable {
 public class DemoServer: DataServer {
   public init(){}
   
-  var typeStore = [Id: [Storable]]() {
-    didSet {
-      bindingHandlers.forEach { handler in
-        handler.arrayCallback(typeStore[handler.typeId] ?? [])
-        handler.valueCallback(typeStore[handler.typeId]?.first)
-      }
-    }
-  }
+  var typeStore = [Id: [Storable]]()
   
   var bindingHandlers = Set<DemoBindingHandler>()
     
@@ -58,6 +53,14 @@ public class DemoServer: DataServer {
       typeStore[type(of: storable).typeId] = [storable]
     } else {
       typeStore[type(of: storable).typeId]?.append(storable)
+    }
+    
+    bindingHandlers.forEach { handler in
+      if handler.observedIds.contains(storable.id) {
+        let observedStorables = typeStore[handler.typeId]?.filter { handler.observedIds.contains($0.id) } ?? []
+        handler.arrayCallback(observedStorables)
+        handler.valueCallback(observedStorables.first)
+      }
     }
   }
   
@@ -74,7 +77,8 @@ public class DemoServer: DataServer {
   }
   
   public func get(id: Id, ofDataType type: Storable.Type, completion: @escaping (Storable?) -> ()) {
-    let first = (typeStore[type.typeId] ?? []).first { $0.id == id }
+    let typeId = type.typeId
+    let first = (typeStore[typeId] ?? []).first { $0.id == id }
     completion(first)
   }
   
@@ -84,6 +88,7 @@ public class DemoServer: DataServer {
     handler.server = self
     handler.typeId = typeId
     handler.valueCallback = completion
+    handler.observedIds.append(id)
     bindingHandlers.insert(handler)
     return handler
   }
@@ -102,6 +107,7 @@ public class DemoServer: DataServer {
     handler.server = self
     handler.typeId = typeId
     handler.arrayCallback = completion
+    handler.observedIds += ids
     bindingHandlers.insert(handler)
     return handler
   }

@@ -28,9 +28,9 @@ class StorableTests: XCTestCase {
   
   func testTypeName() {
     XCTAssert(type(of:testData).typeId == "test_typename")
-    XCTAssert(getTypeId(testData) == "test")
+    XCTAssert(TestData.typeId == "test_typename")
     
     XCTAssert(type(of:testTestData).typeId == "test_test")
-    XCTAssert(getTypeId(testTestData) == "test_test")
+    XCTAssert(TestTestData.typeId == "test_test")
   }
 }

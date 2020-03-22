@@ -22,10 +22,6 @@ public extension Storable {
   }
 }
 
-public func getTypeId<T: Storable>(_ storable: T) -> Id {
-  return "\(type(of: storable))".deletingSuffix("Data").camelCaseToSnakeCase()
-}
-
 extension String {
   func deletingSuffix(_ suffix: String) -> String {
     guard self.hasSuffix(suffix) else { return self }

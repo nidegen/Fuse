@@ -12,3 +12,9 @@ public struct DemoData: Storable {
   public var id: Id
   public var age = 0
 }
+
+public struct DemoDemoData: Storable {
+  public var id: Id
+  public var test = "test"
+}
+
