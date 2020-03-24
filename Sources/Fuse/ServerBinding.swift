@@ -72,19 +72,24 @@ class ServerBinding<T:Storable> {
     }
   }
   
-  //  public static subscript<EnclosingSelf: AnyObject>(
-  //      _enclosingInstance object: EnclosingSelf,
-  //      wrapped wrappedKeyPath: ReferenceWritableKeyPath<EnclosingSelf, T>,
-  //      storage storageKeyPath: ReferenceWritableKeyPath<EnclosingSelf, Setting<T>>
-  //  ) -> T {
-  //      get {
-  //          return object[keyPath: storageKeyPath].wrappedValue
-  //      }
-  //      set {
-  //          object[keyPath: storageKeyPath].objectWillChange?.send()
-  //          object[keyPath: storageKeyPath].publisher?.subject.send(newValue)
-  //          object[keyPath: storageKeyPath].wrappedValue = newValue
-  //      }
-  //      // TODO: Benchmark and explore a possibility to use _modify
-  //  }
+  public static subscript<EnclosingSelf: ObservableObject>(
+    _enclosingInstance object: EnclosingSelf,
+    wrapped wrappedKeyPath: ReferenceWritableKeyPath<EnclosingSelf, T>,
+    storage storageKeyPath: ReferenceWritableKeyPath<EnclosingSelf, Self>
+  ) -> T {
+    get {
+      if object[keyPath: storageKeyPath].objectWillChange == nil {
+        object[keyPath: storageKeyPath].objectWillChange = object.objectWillChange as? ObservableObjectPublisher
+      }
+      return object[keyPath: storageKeyPath].wrappedValue
+    }
+    set {
+      if object[keyPath: storageKeyPath].objectWillChange == nil {
+        object[keyPath: storageKeyPath].objectWillChange = object.objectWillChange as? ObservableObjectPublisher
+      }
+      object[keyPath: storageKeyPath].objectWillChange?.send()
+      object[keyPath: storageKeyPath].publisher?.subject.send(newValue)
+      object[keyPath: storageKeyPath].wrappedValue = newValue
+    }
+  }
 }
