@@ -8,7 +8,7 @@
 
 import Fuse
 
-public struct DemoData: Storable {
+public struct DemoData: Storable, Equatable {
   public var id: Id
   public var age = 0
 }

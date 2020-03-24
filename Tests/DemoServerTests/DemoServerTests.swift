@@ -45,19 +45,31 @@ final class DemoServerTests: XCTestCase {
   }
   
   func testGetStorable() {
-    let data = DemoData(id: "a", age: 12)
+    let a = DemoData(id: "a", age: 12)
+    let b = DemoData(id: "b", age: 122)
     let server = DemoServer()
-    server.set(data)
-    server.get(id: data.id) { (received: DemoData?) in
-      XCTAssert(received?.id == data.id)
-      XCTAssert(received?.age == data.age)
+    server.set(a)
+    XCTAssert(server.typeStore[DemoData.typeId]?.count == 1)
+    
+    server.set(b)
+    XCTAssert(server.typeStore[DemoData.typeId]?.count == 2)
+    
+    server.get(id: a.id) { (received: DemoData?) in
+      XCTAssert(received?.id == a.id)
+      XCTAssert(received?.age == a.age)
+    }
+    server.get(ids: ["a", "b"]) { (data:[DemoData]) in
+      XCTAssert(data.contains(a))
+      XCTAssert(data.contains(b))
     }
     XCTAssert(server.typeStore[DemoData.typeId] != nil)
-    XCTAssert(server.typeStore[DemoData.typeId]?.count == 1)
+    XCTAssert(server.typeStore[DemoData.typeId]?.count == 2)
   }
   
   func testBindStorable() {
     let expectation = XCTestExpectation(description: "Listen to change")
+    let nonExpectation = XCTestExpectation(description: "Expect not to trigger")
+    nonExpectation.isInverted = true
     var inbox = [DemoData?]()
     let data = DemoData(id: "a", age: 12)
     let server = DemoServer()
@@ -65,8 +77,11 @@ final class DemoServerTests: XCTestCase {
       inbox.append(received)
       if inbox.count == 3 {
         expectation.fulfill()
+      } else if inbox.count > 3 {
+        nonExpectation.fulfill()
       }
     }
+    server.set(data)
     server.set(data)
     server.set(DemoData(id: "a", age: 33))
   }

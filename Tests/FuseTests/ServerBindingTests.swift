@@ -25,5 +25,10 @@ class ServerBindingTests: XCTestCase {
     XCTAssert(testClass.testData.name == "1")
     testServer.set(TestData(id: testClass.testData.id, name: "one"))
     XCTAssert(testClass.testData.name == "one")
+    testClass.testData.name = "ha"
+    testServer.get(id: "1", ofDataType: TestData.self) { (data: Storable?) in
+      let test = data as? TestData
+      XCTAssert(test?.name == "ha")
+    }
   }
 }

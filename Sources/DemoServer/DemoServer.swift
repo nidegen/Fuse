@@ -44,20 +44,22 @@ extension DemoBindingHandler: Hashable {
 public class DemoServer: DataServer {
   public init(){}
   
-  var typeStore = [Id: [Storable]]()
+  var typeStore = [Id: [Id: Storable]]()
   
   var bindingHandlers = Set<DemoBindingHandler>()
     
   public func set(_ storable: Storable) {
     if typeStore[type(of: storable).typeId] == nil {
-      typeStore[type(of: storable).typeId] = [storable]
+      typeStore[type(of: storable).typeId] = [storable.id: storable]
     } else {
-      typeStore[type(of: storable).typeId]?.append(storable)
+      typeStore[type(of: storable).typeId]?[storable.id] = storable
     }
     
     bindingHandlers.forEach { handler in
       if handler.observedIds.contains(storable.id) {
-        let observedStorables = typeStore[handler.typeId]?.filter { handler.observedIds.contains($0.id) } ?? []
+        let observedStorables = typeStore[handler.typeId]?.compactMap { (key: Id, value: Storable) in
+          return handler.observedIds.contains(key) ? value : nil
+        } ?? []
         handler.arrayCallback(observedStorables)
         handler.valueCallback(observedStorables.first)
       }
@@ -65,25 +67,25 @@ public class DemoServer: DataServer {
   }
   
   public func delete(_ id: Id, forDataType type: Storable.Type, completion: ((Error?) -> ())?) {
-    typeStore[type.typeId] = typeStore[type.typeId]?.filter { $0.id != id }
+    typeStore[type.typeId]?[id] = nil
   }
   
   public func get(dataOfType type: Storable.Type, whereDataField dataField: String, isEqualTo value: Any, orderField: String?, descendingOrder: Bool, completion: @escaping ([Storable]) -> ()) {
-    completion(typeStore[type.typeId] ?? [])
+    completion(typeStore[type.typeId]?.compactMap { return $1 } ?? [])
   }
   
   public func get(ids: [Id], ofDataType type: Storable.Type, completion: @escaping ([Storable]) -> ()) {
-    completion(typeStore[type.typeId] ?? [])
+    completion(typeStore[type.typeId]?.compactMap { return ids.contains($0) ? $1 : nil } ?? [])
   }
   
   public func get(id: Id, ofDataType type: Storable.Type, completion: @escaping (Storable?) -> ()) {
     let typeId = type.typeId
-    let first = (typeStore[typeId] ?? []).first { $0.id == id }
+    let first = (typeStore[typeId]?.compactMap { return id == $0 ? $1 : nil } ?? []).first { $0.id == id }
     completion(first)
   }
   
   public func bind(typeId: Id, toId id: Id, completion: @escaping (Storable?) -> ()) -> BindingHandler {
-    completion(typeStore[typeId]?.first { $0.id == id })
+    completion(typeStore[typeId]?[id])
     let handler = DemoBindingHandler()
     handler.server = self
     handler.typeId = typeId
