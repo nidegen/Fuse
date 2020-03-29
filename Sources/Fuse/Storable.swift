@@ -20,6 +20,7 @@ public extension Storable {
   static var typeId: String {
     return "\(self)".deletingSuffix("Data").camelCaseToSnakeCase()
   }
+  func toJSONData() -> Data?{ try? JSONEncoder().encode(self) }
 }
 
 extension String {

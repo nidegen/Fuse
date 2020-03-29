@@ -22,11 +22,11 @@ public protocol DataServer {
   func get(ids: [Id], ofDataType type: Storable.Type, completion: @escaping ([Storable])->())
   func get(id: Id, ofDataType type: Storable.Type, completion: @escaping (Storable?)->())
   
-  func bind(typeId: Id, toId id: Id, completion: @escaping (Storable?)->()) -> BindingHandler
+  func bind(toId id: Id, ofDataType type: Storable.Type, completion: @escaping (Storable?) -> ()) -> BindingHandler
   
-  func bind(typeId: Id, whereDataField dataField: String, isEqualTo value: Any, orderField: String?,
-            descendingOrder: Bool, completion: @escaping ([Storable])->()) -> BindingHandler
-  func bind(typeId: Id, toIds ids: [Id], completion: @escaping ([Storable])->()) -> BindingHandler
+  func bind(dataOfType type: Storable.Type, whereDataField dataField: String, isEqualTo value: Any, orderField: String?, descendingOrder: Bool, completion: @escaping ([Storable]) -> ()) -> BindingHandler
+  
+  func bind(toIds ids: [Id], ofDataType type: Storable.Type,  completion: @escaping ([Storable]) -> ()) -> BindingHandler
 }
 
 public extension DataServer {
@@ -35,22 +35,22 @@ public extension DataServer {
     storables.forEach { set($0) }
   }
   
-  func bind<T: Storable>(whereDataField dataField: String, isEqualTo value: Any, orderField: String?,
-                         descendingOrder: Bool, completion: @escaping ([T])->()) -> BindingHandler {
-    self.bind(typeId: T.typeId, whereDataField: dataField, isEqualTo: value, orderField: orderField,
+  func bind<T: Storable>(whereDataField dataField: String, isEqualTo value: Any, orderField: String? = nil,
+                         descendingOrder: Bool = true, completion: @escaping ([T])->()) -> BindingHandler {
+    self.bind(dataOfType: T.self, whereDataField: dataField, isEqualTo: value, orderField: orderField,
                 descendingOrder: descendingOrder) { data in
                   completion(data as? [T] ?? [])
     }
   }
   
   func bind<T: Storable>(forIds ids: [Id], completion: @escaping ([T])->()) -> BindingHandler {
-    return self.bind(typeId: T.typeId, toIds: ids) { data in
+    return self.bind(toIds: ids, ofDataType: T.self) { data in
       completion(data as? [T] ?? [])
     }
   }
   
   func bind<T: Storable>(forId id: Id, completion: @escaping (T?)->()) -> BindingHandler {
-    return self.bind(typeId: T.typeId, toId: id) { data in
+    return self.bind(toId: id, ofDataType: T.self) { data in
       completion(data as? T)
     }
   }

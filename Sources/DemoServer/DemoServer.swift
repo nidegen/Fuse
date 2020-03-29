@@ -13,7 +13,7 @@ import Fuse
 class DemoBindingHandler: BindingHandler {
   private let id = UUID().uuidString
   
-  weak var server: DemoServer?
+  var server: DemoServer
   
   var typeId: Id = ""
   
@@ -21,10 +21,26 @@ class DemoBindingHandler: BindingHandler {
   var arrayCallback: ([Storable]) -> () = { data in }
   
   func remove() {
-    server?.bindingHandlers.remove(self)
+    server.bindingHandlers.remove(self)
+  }
+  
+  fileprivate init(server: DemoServer) {
+    self.server = server
   }
   
   var observedIds: [Id] = []
+  
+  func updated(value: Storable) {
+    
+    if observedIds.contains(value.id) {
+        valueCallback(value)
+    }
+    if typeId == type(of: value).typeId {
+      (server.typeStore[typeId]?.values).map {
+        arrayCallback(Array($0))
+      }
+    }
+  }
   
   deinit {
     remove()
@@ -42,6 +58,7 @@ extension DemoBindingHandler: Hashable {
 }
 
 public class DemoServer: DataServer {
+  
   public init(){}
   
   var typeStore = [Id: [Id: Storable]]()
@@ -54,16 +71,7 @@ public class DemoServer: DataServer {
     } else {
       typeStore[type(of: storable).typeId]?[storable.id] = storable
     }
-    
-    bindingHandlers.forEach { handler in
-      if handler.observedIds.contains(storable.id) {
-        let observedStorables = typeStore[handler.typeId]?.compactMap { (key: Id, value: Storable) in
-          return handler.observedIds.contains(key) ? value : nil
-        } ?? []
-        handler.arrayCallback(observedStorables)
-        handler.valueCallback(observedStorables.first)
-      }
-    }
+    bindingHandlers.forEach { $0.updated(value: storable)}
   }
   
   public func delete(_ id: Id, forDataType type: Storable.Type, completion: ((Error?) -> ())?) {
@@ -84,33 +92,49 @@ public class DemoServer: DataServer {
     completion(first)
   }
   
-  public func bind(typeId: Id, toId id: Id, completion: @escaping (Storable?) -> ()) -> BindingHandler {
-    completion(typeStore[typeId]?[id])
-    let handler = DemoBindingHandler()
+  public func bind(toId id: Id, ofDataType type: Storable.Type, completion: @escaping (Storable?) -> ()) -> BindingHandler {
+    completion(typeStore[type.typeId]?[id])
+    let handler = DemoBindingHandler(server: self)
     handler.server = self
-    handler.typeId = typeId
+    handler.typeId = type.typeId
     handler.valueCallback = completion
     handler.observedIds.append(id)
     bindingHandlers.insert(handler)
     return handler
   }
   
-  public func bind(typeId: Id, whereDataField dataField: String, isEqualTo value: Any, orderField: String?, descendingOrder: Bool, completion: @escaping ([Storable]) -> ()) -> BindingHandler {
-    let handler = DemoBindingHandler()
+  public func bind(dataOfType type: Storable.Type, whereDataField dataField: String, isEqualTo value: Any, orderField: String?, descendingOrder: Bool, completion: @escaping ([Storable]) -> ()) -> BindingHandler {
+    let handler = DemoBindingHandler(server: self)
     handler.server = self
-    handler.typeId = typeId
-    handler.arrayCallback = completion
+    handler.typeId = type.typeId
+    handler.arrayCallback = { storables in
+      let filtered = storables.filter { storable in
+        guard let json = storable.toJSONData() else { return false }
+        guard let dict = ((try? JSONSerialization.jsonObject(with: json, options: .allowFragments)).flatMap { $0 as? [String: Any] }) else { return false }
+        guard let fieldValue = dict[dataField] else { return false }
+        
+        return isEqual(a: fieldValue, b: value, as: Int.self) || isEqual(a: fieldValue, b: value, as: Double.self) || isEqual(a: fieldValue, b: value, as: Float.self) || isEqual(a: fieldValue, b: value, as: String.self) || isEqual(a: fieldValue, b: value, as: Bool.self)
+      }
+      let sorted = filtered
+      completion(sorted)
+    }
     bindingHandlers.insert(handler)
     return handler
   }
   
-  public func bind(typeId: Id, toIds ids: [Id], completion: @escaping ([Storable]) -> ()) -> BindingHandler {
-    let handler = DemoBindingHandler()
+  public func bind(toIds ids: [Id], ofDataType type: Storable.Type,  completion: @escaping ([Storable]) -> ()) -> BindingHandler {
+    let handler = DemoBindingHandler(server: self)
     handler.server = self
-    handler.typeId = typeId
+    handler.typeId = type.typeId
     handler.arrayCallback = completion
     handler.observedIds += ids
     bindingHandlers.insert(handler)
     return handler
   }
+}
+
+func isEqual<T: Equatable>(a: Any, b: Any, as type: T.Type) -> Bool {
+  guard let aa = a as? T else { return false }
+  guard let bb = b as? T else { return false }
+  return aa == bb
 }

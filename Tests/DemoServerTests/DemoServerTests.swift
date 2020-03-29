@@ -85,4 +85,19 @@ final class DemoServerTests: XCTestCase {
     server.set(data)
     server.set(DemoData(id: "a", age: 33))
   }
+  
+  func testBindWhere() {
+    let expectation = XCTestExpectation(description: "Listen to change")
+    let a = DemoData(id: "a", age: 12)
+    let b = DemoData(id: "b", age: 13)
+    let c = DemoData(id: "c", age: 12)
+    let d = DemoData(id: "d", age: 14)
+    let server = DemoServer()
+    server.set([a,b,c,d])
+    let binding = server.bind(whereDataField: "age", isEqualTo: 12) { (data: [DemoData]) in
+      XCTAssert(data.count == 2)
+      expectation.fulfill()
+    }
+    server.set(DemoData(id: "e", age: 1))
+  }
 }
