@@ -12,7 +12,7 @@ public protocol BindingHandler: class {
   func remove()
 }
 
-public protocol DataServer {
+public protocol DataServer: class {
   func set(_ storables: [Storable])
   func set(_ storable: Storable)
   func delete(_ id: Id, forDataType type: Storable.Type, completion: ((Error?)->())?)
@@ -26,7 +26,7 @@ public protocol DataServer {
   
   func bind(dataOfType type: Storable.Type, whereDataField dataField: String, isEqualTo value: Any, orderField: String?, descendingOrder: Bool, completion: @escaping ([Storable]) -> ()) -> BindingHandler
   
-  func bind(toIds ids: [Id], ofDataType type: Storable.Type,  completion: @escaping ([Storable]) -> ()) -> BindingHandler
+  func bind(toIds ids: [Id], ofDataType type: Storable.Type, completion: @escaping ([Storable]) -> ()) -> BindingHandler
 }
 
 public extension DataServer {

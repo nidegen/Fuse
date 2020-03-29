@@ -14,6 +14,8 @@ class ServerBinding<T:Storable> {
   var observerHandle: BindingHandler!
   var server: DataServer
   
+  var setIsInternal = false
+  
   init(wrappedValue value: T, server: DataServer) {
     self.data = value
     self.server = server
@@ -22,7 +24,9 @@ class ServerBinding<T:Storable> {
   
   func callback(update: T?) {
     update.map {
+      setIsInternal = true
       self.data = $0
+      setIsInternal = false
     }
   }
   
@@ -32,9 +36,11 @@ class ServerBinding<T:Storable> {
     }
     
     set {
-      data = newValue
-      server.set(data)
       objectWillChange?.send()
+      data = newValue
+      if !setIsInternal {
+        server.set(data)
+      }
       publisher?.subject.value = newValue
     }
   }

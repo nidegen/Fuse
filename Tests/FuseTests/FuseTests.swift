@@ -7,7 +7,12 @@
 //
 
 import XCTest
+
+import DemoServer
+
 @testable import Fuse
+
+var testServer = DemoServer()
 
 final class FuseTests: XCTestCase {
   func testExample() {

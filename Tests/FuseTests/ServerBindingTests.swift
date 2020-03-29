@@ -8,11 +8,8 @@
 
 import XCTest
 
-import DemoServer
-
 @testable import Fuse
 
-var testServer = DemoServer()
 
 class TestClass {
   @ServerBinding(server: testServer)

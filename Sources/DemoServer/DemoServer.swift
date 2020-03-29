@@ -35,6 +35,7 @@ class DemoBindingHandler: BindingHandler {
     if observedIds.contains(value.id) {
         valueCallback(value)
     }
+    
     if typeId == type(of: value).typeId {
       (server.typeStore[typeId]?.values).map {
         arrayCallback(Array($0))
