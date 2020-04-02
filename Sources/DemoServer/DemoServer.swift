@@ -28,15 +28,13 @@ class DemoBindingHandler: BindingHandler {
     self.server = server
   }
   
-  var observedIds: [Id] = []
+  var observedIds: [Id]?
   
   func updated(value: Storable) {
     
-    if observedIds.contains(value.id) {
+    if observedIds?.contains(value.id) ?? false {
         valueCallback(value)
-    }
-    
-    if typeId == type(of: value).typeId {
+    } else if typeId == type(of: value).typeId {
       (server.typeStore[typeId]?.values).map {
         arrayCallback(Array($0))
       }
@@ -65,6 +63,10 @@ public class DemoServer: DataServer {
   var typeStore = [Id: [Id: Storable]]()
   
   var bindingHandlers = Set<DemoBindingHandler>()
+  
+  enum BindingTypes {
+    case value, array, filteredArray, typedArray
+  }
     
   public func set(_ storable: Storable) {
     if typeStore[type(of: storable).typeId] == nil {
@@ -99,7 +101,7 @@ public class DemoServer: DataServer {
     handler.server = self
     handler.typeId = type.typeId
     handler.valueCallback = completion
-    handler.observedIds.append(id)
+    handler.observedIds = [id]
     bindingHandlers.insert(handler)
     return handler
   }
@@ -128,7 +130,16 @@ public class DemoServer: DataServer {
     handler.server = self
     handler.typeId = type.typeId
     handler.arrayCallback = completion
-    handler.observedIds += ids
+    handler.observedIds = ids
+    bindingHandlers.insert(handler)
+    return handler
+  }
+  
+  public func bind(toDataType type: Storable.Type, completion: @escaping ([Storable]) -> ()) -> BindingHandler {
+    let handler = DemoBindingHandler(server: self)
+    handler.server = self
+    handler.typeId = type.typeId
+    handler.arrayCallback = completion
     bindingHandlers.insert(handler)
     return handler
   }
