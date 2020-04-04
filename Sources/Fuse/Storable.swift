@@ -21,6 +21,10 @@ public extension Storable {
     return "\(self)".deletingSuffix("Data").camelCaseToSnakeCase()
   }
   
+  static func decode(fromData data: Data) throws -> Storable {
+    return try JSONDecoder().decode(self, from: data)
+  }
+  
   func toJSONData() -> Data? { try? JSONEncoder().encode(self) }
   
   func hash(into hasher: inout Hasher) {
