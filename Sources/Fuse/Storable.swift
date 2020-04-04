@@ -20,7 +20,16 @@ public extension Storable {
   static var typeId: String {
     return "\(self)".deletingSuffix("Data").camelCaseToSnakeCase()
   }
-  func toJSONData() -> Data?{ try? JSONEncoder().encode(self) }
+  
+  func toJSONData() -> Data? { try? JSONEncoder().encode(self) }
+  
+  func hash(into hasher: inout Hasher) {
+    hasher.combine(id)
+  }
+  
+  static func ==(lhs: Storable, rhs: Storable) -> Bool {
+    return lhs.id == rhs.id
+  }
 }
 
 extension String {
