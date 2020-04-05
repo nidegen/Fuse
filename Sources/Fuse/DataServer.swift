@@ -26,7 +26,6 @@ public protocol DataServer: class {
   
   func bind(dataOfType type: Storable.Type, whereDataField dataField: String, isEqualTo value: Any, orderField: String?, descendingOrder: Bool, completion: @escaping ([Storable]) -> ()) -> BindingHandler
   
-  func bind(toIds ids: [Id], ofDataType type: Storable.Type, completion: @escaping ([Storable]) -> ()) -> BindingHandler
   func bind(toDataType type: Storable.Type, completion: @escaping ([Storable]) -> ()) -> BindingHandler
 }
 
@@ -46,12 +45,6 @@ public extension DataServer {
   
   func bind<T: Storable>(completion: @escaping ([T])->()) -> BindingHandler {
     return self.bind(toDataType: T.self) { data in
-      completion(data as? [T] ?? [])
-    }
-  }
-  
-  func bind<T: Storable>(forIds ids: [Id], completion: @escaping ([T])->()) -> BindingHandler {
-    return self.bind(toIds: ids, ofDataType: T.self) { data in
       completion(data as? [T] ?? [])
     }
   }
@@ -100,4 +93,3 @@ public extension DataServer {
 //  func get<Storable: Storable>(forIds ids: [Id], completion: @escaping ([Storable])->())
 //
 //  func get<Storable: Storable>(forId id: Id, completion: @escaping (Storable?)->())
-
