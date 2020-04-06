@@ -12,6 +12,7 @@ public typealias Id = String
 
 public protocol Storable: Codable {
   static var typeId: Id { get }
+  static var serverVersionString: String { get }
   var id: Id { get }
 }
 
