@@ -1,5 +1,5 @@
 //
-//  DataServer.swift
+//  Server.swift
 //  Fuse
 //
 //  Created by Nicolas Degen on 19.03.20.
@@ -12,7 +12,7 @@ public protocol BindingHandler: class {
   func remove()
 }
 
-public protocol DataServer: class {
+public protocol Server: class {
   func set(_ storables: [Storable])
   func set(_ storable: Storable)
   func delete(_ id: Id, forDataType type: Storable.Type, completion: ((Error?)->())?)
@@ -29,7 +29,7 @@ public protocol DataServer: class {
   func bind(toDataType type: Storable.Type, completion: @escaping ([Storable]) -> ()) -> BindingHandler
 }
 
-public extension DataServer {
+public extension Server {
   
   func set(_ storables: [Storable]) {
     storables.forEach { set($0) }
@@ -49,7 +49,7 @@ public extension DataServer {
     }
   }
   
-  func bind<T: Storable>(forId id: Id, completion: @escaping (T?)->()) -> BindingHandler {
+  func bind<T: Storable>(toId id: Id, completion: @escaping (T?)->()) -> BindingHandler {
     return self.bind(toId: id, ofDataType: T.self) { data in
       completion(data as? T)
     }
@@ -76,7 +76,7 @@ public extension DataServer {
   }
 }
 
-//protocol DataServer {
+//protocol Server {
 //
 //  func delete<Storable: Storable>(_ id: Id, forDataType type: Storable.Type,
 //  completion: ((Error?)->())? = nil)

@@ -12,7 +12,7 @@ import XCTest
 
 
 class TestArrayClass {
-  @ServerArrayBinding(server: testServer, whereDataField: "name", isEqualTo: "Peter")
+  @ArrayBinding(server: testServer, whereDataField: "name", isEqualTo: "Peter")
   var testData = [TestData]()
 }
 

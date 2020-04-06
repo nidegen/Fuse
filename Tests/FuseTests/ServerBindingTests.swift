@@ -12,8 +12,11 @@ import XCTest
 
 
 class TestClass {
-  @ServerBinding(server: testServer)
+  @Binding(server: testServer)
   var testData = TestData(id: "1", name: "1")
+  
+  @OptionalBinding(id: "sdf", server: testServer)
+  var data: TestData?
 }
 
 class ServerBindingTests: XCTestCase {

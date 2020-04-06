@@ -73,7 +73,7 @@ final class DemoServerTests: XCTestCase {
     var inbox = [DemoData?]()
     let data = DemoData(id: "a", age: 12)
     let server = DemoServer()
-    let binding = server.bind(forId: "a") { (received: DemoData?) in
+    let binding = server.bind(toId: "a") { (received: DemoData?) in
       inbox.append(received)
       if inbox.count == 3 {
         expectation.fulfill()

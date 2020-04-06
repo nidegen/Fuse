@@ -1,5 +1,5 @@
 //
-//  ServerBinding.swift
+//  ArrayBinding.swift
 //  Fuse
 //
 //  Created by Nicolas Degen on 29.03.20.
@@ -9,14 +9,14 @@
 import Combine
 
 @propertyWrapper
-class ServerArrayBinding<T:Storable> {
+class ArrayBinding<T:Storable> {
   var data: [T]
   var observerHandle: BindingHandler!
-  var server: DataServer
+  var server: Server
   
   var setIsInternal = false
 
-  init(wrappedValue value: [T], server: DataServer, whereDataField field: String, isEqualTo comparedValue: Any) {
+  init(wrappedValue value: [T], server: Server, whereDataField field: String, isEqualTo comparedValue: Any) {
     self.data = value
     self.server = server
     observerHandle = server.bind(whereDataField: field, isEqualTo: comparedValue, completion: callback)
