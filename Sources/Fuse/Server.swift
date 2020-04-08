@@ -26,6 +26,8 @@ public protocol Server: class {
   
   func bind(dataOfType type: Storable.Type, whereDataField dataField: String, isEqualTo value: Any, orderField: String?, descendingOrder: Bool, completion: @escaping ([Storable]) -> ()) -> BindingHandler
   
+  func bind(dataOfType type: Storable.Type, whereDataField dataField: String, contains value: Any, completion: @escaping ([Storable]) -> ()) -> BindingHandler
+  
   func bind(toDataType type: Storable.Type, completion: @escaping ([Storable]) -> ()) -> BindingHandler
 }
 
@@ -39,6 +41,12 @@ public extension Server {
                          descendingOrder: Bool = true, completion: @escaping ([T])->()) -> BindingHandler {
     self.bind(dataOfType: T.self, whereDataField: dataField, isEqualTo: value, orderField: orderField,
                 descendingOrder: descendingOrder) { data in
+                  completion(data as? [T] ?? [])
+    }
+  }
+  
+  func bind<T: Storable>(whereDataField dataField: String, contains value: Any, completion: @escaping ([T])->()) -> BindingHandler {
+    self.bind(dataOfType: T.self, whereDataField: dataField, contains: value) { data in
                   completion(data as? [T] ?? [])
     }
   }

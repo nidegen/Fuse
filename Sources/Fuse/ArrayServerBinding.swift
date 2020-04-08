@@ -21,6 +21,12 @@ public class ArrayServerBinding<T:Storable> {
     self.server = server
     observerHandle = server.bind(whereDataField: field, isEqualTo: comparedValue, completion: callback)
   }
+
+  public init(wrappedValue value: [T], server: Server, whereDataField field: String, contains comparedValue: Any) {
+    self.data = value
+    self.server = server
+    observerHandle = server.bind(whereDataField: field, isEqualTo: comparedValue, completion: callback)
+  }
   
   func callback(update: [T]) {
     setIsInternal = true

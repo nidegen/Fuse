@@ -125,6 +125,26 @@ public class DemoServer: DataServer {
     return handler
   }
   
+  
+  public func bind(dataOfType type: Storable.Type, whereDataField dataField: String, contains value: Any, completion: @escaping ([Storable]) -> ()) -> BindingHandler {
+    let handler = DemoBindingHandler(server: self)
+    handler.server = self
+    handler.typeId = type.typeId
+    handler.arrayCallback = { storables in
+      let filtered = storables.filter { storable in
+        guard let json = storable.toJSONData() else { return false }
+        guard let dict = ((try? JSONSerialization.jsonObject(with: json, options: .allowFragments)).flatMap { $0 as? [String: Any] }) else { return false }
+        guard let fieldValue = dict[dataField] else { return false }
+        
+        return isEqual(a: fieldValue, b: value, as: Int.self) || isEqual(a: fieldValue, b: value, as: Double.self) || isEqual(a: fieldValue, b: value, as: Float.self) || isEqual(a: fieldValue, b: value, as: String.self) || isEqual(a: fieldValue, b: value, as: Bool.self)
+      }
+      let sorted = filtered
+      completion(sorted)
+    }
+    bindingHandlers.insert(handler)
+    return handler
+  }
+  
   public func bind(toIds ids: [Id], ofDataType type: Storable.Type,  completion: @escaping ([Storable]) -> ()) -> BindingHandler {
     let handler = DemoBindingHandler(server: self)
     handler.server = self
