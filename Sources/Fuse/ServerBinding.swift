@@ -16,7 +16,7 @@ public class ServerBinding<T:Storable> {
   
   var setIsInternal = false
   
-  init(wrappedValue value: T, server: Server) {
+  public init(wrappedValue value: T, server: Server, publisher:ObservableObjectPublisher? = nil) {
     self.data = value
     self.server = server
     self.observerHandle = server.bind(toId: value.id, completion: callback)

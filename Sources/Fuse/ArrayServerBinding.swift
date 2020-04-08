@@ -16,16 +16,18 @@ public class ArrayServerBinding<T:Storable> {
   
   var setIsInternal = false
 
-  public init(wrappedValue value: [T], server: Server, whereDataField field: String, isEqualTo comparedValue: Any) {
-    self.data = value
+  public init(server: Server, whereDataField field: String, isEqualTo comparedValue: Any, publisher: ObservableObjectPublisher? = nil) {
+    self.data = [T]()
     self.server = server
     observerHandle = server.bind(whereDataField: field, isEqualTo: comparedValue, completion: callback)
+    objectWillChange = publisher
   }
 
-  public init(wrappedValue value: [T], server: Server, whereDataField field: String, contains comparedValue: Any) {
-    self.data = value
+  public init(server: Server, whereDataField field: String, contains comparedValue: Any, publisher: ObservableObjectPublisher? = nil) {
+    self.data = [T]()
     self.server = server
     observerHandle = server.bind(whereDataField: field, isEqualTo: comparedValue, completion: callback)
+    objectWillChange = publisher
   }
   
   func callback(update: [T]) {
