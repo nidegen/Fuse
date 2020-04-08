@@ -1,5 +1,5 @@
 //
-//  Binding.swift
+//  ServerBinding.swift
 //  Fuse
 //
 //  Created by Nicolas Degen on 20.03.20.
@@ -9,12 +9,14 @@
 import Combine
 
 @propertyWrapper
-class Binding<T:Storable> {
+public class ServerBinding<T:Storable> {
   var data: T
   var observerHandle: BindingHandler!
   var server: Server
   
   var setIsInternal = false
+  
+  public init() {}
   
   init(wrappedValue value: T, server: Server) {
     self.data = value
@@ -102,7 +104,7 @@ class Binding<T:Storable> {
 
 
 @propertyWrapper
-class OptionalBinding<T:Storable> {
+public class OptionalServerBinding<T:Storable> {
   var data: T?
   var observerHandle: BindingHandler!
   var server: Server
@@ -110,7 +112,9 @@ class OptionalBinding<T:Storable> {
   var setIsInternal = false
   var id: Id
   
-  init(id: Id, server: Server) {
+  public init() {}
+  
+  public init(id: Id, server: Server) {
     self.id = id
     self.server = server
     self.observerHandle = server.bind(toId: id, completion: callback)
