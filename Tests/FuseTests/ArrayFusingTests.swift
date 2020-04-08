@@ -1,5 +1,5 @@
 //
-//  ServerBindingTests.swift
+//  ArrayFusingTests.swift
 //  FuseTests
 //
 //  Created by Nicolas Degen on 29.03.20.
@@ -16,7 +16,7 @@ class TestArrayClass {
   var testData = [TestData]()
 }
 
-class ServerArrayBindingTests: XCTestCase {
+class ArrayFusingTests: XCTestCase {
   override func setUp() {
     testServer.set([TestData(id: "a", name: "Peter"),
                     TestData(id: "b", name: "Mark"),

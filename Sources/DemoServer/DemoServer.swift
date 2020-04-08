@@ -56,7 +56,7 @@ extension DemoBindingHandler: Hashable {
   }
 }
 
-public class DemoServer: DataServer {
+public class DemoServer: Server {
   
   public init(){}
   

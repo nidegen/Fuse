@@ -1,5 +1,5 @@
 //
-//  ServerBindingTests.swift
+//  FusingTests.swift
 //  FuseTests
 //
 //  Created by Nicolas Degen on 20.03.20.
@@ -19,7 +19,7 @@ class TestClass {
   var data: TestData?
 }
 
-class ServerBindingTests: XCTestCase {
+class FusingTests: XCTestCase {
   func testSetter() {
     let testClass = TestClass()
     XCTAssert(testClass.testData.name == "1")

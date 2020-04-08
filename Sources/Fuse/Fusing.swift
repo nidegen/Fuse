@@ -1,5 +1,5 @@
 //
-//  ServerBinding.swift
+//  Fusing.swift
 //  Fuse
 //
 //  Created by Nicolas Degen on 20.03.20.
@@ -9,7 +9,7 @@
 import Combine
 
 @propertyWrapper
-public class ServerBinding<T:Storable> {
+public class Fusing<T:Storable> {
   var data: T
   var observerHandle: BindingHandler!
   var server: Server
@@ -102,7 +102,7 @@ public class ServerBinding<T:Storable> {
 
 
 @propertyWrapper
-public class OptionalServerBinding<T:Storable> {
+public class OptionalFusing<T:Storable> {
   var data: T?
   var observerHandle: BindingHandler!
   var server: Server

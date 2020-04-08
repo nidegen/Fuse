@@ -18,3 +18,8 @@ public struct DemoDemoData: Storable {
   public var test = "test"
 }
 
+extension Storable {
+  public static var serverVersionString: String { "test" }
+
+}
+

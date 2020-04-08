@@ -1,5 +1,5 @@
 //
-//  ArrayServerBinding.swift
+//  ArrayFusing.swift
 //  Fuse
 //
 //  Created by Nicolas Degen on 29.03.20.
@@ -9,7 +9,7 @@
 import Combine
 
 @propertyWrapper
-public class ArrayServerBinding<T:Storable> {
+public class ArrayFusing<T:Storable> {
   var data: [T]
   var observerHandle: BindingHandler!
   var server: Server
