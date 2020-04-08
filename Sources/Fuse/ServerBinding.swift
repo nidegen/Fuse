@@ -16,8 +16,6 @@ public class ServerBinding<T:Storable> {
   
   var setIsInternal = false
   
-  public init() {}
-  
   init(wrappedValue value: T, server: Server) {
     self.data = value
     self.server = server
@@ -111,9 +109,7 @@ public class OptionalServerBinding<T:Storable> {
   
   var setIsInternal = false
   var id: Id
-  
-  public init() {}
-  
+    
   public init(id: Id, server: Server) {
     self.id = id
     self.server = server
