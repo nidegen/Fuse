@@ -113,7 +113,9 @@ public class OptionalFusing<T:Storable> {
   public init(id: Id, server: Server) {
     self.id = id
     self.server = server
-    self.observerHandle = server.bind(toId: id, completion: callback)
+    self.observerHandle = server.bind(toId: id) { [weak self] (update: T?) in
+      self?.callback(update: update)
+    }
   }
   
   func callback(update: T?) {

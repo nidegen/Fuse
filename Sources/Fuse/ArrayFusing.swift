@@ -19,14 +19,18 @@ public class ArrayFusing<T:Storable> {
   public init(server: Server, whereDataField field: String, isEqualTo comparedValue: Any, publisher: ObservableObjectPublisher? = nil) {
     self.data = [T]()
     self.server = server
-    observerHandle = server.bind(whereDataField: field, isEqualTo: comparedValue, completion: callback)
+    observerHandle = server.bind(whereDataField: field, isEqualTo: comparedValue) { [weak self] (update: [T]) in
+      self?.callback(update: update)
+    }
     objectWillChange = publisher
   }
 
   public init(server: Server, whereDataField field: String, contains comparedValue: Any, publisher: ObservableObjectPublisher? = nil) {
     self.data = [T]()
     self.server = server
-    observerHandle = server.bind(whereDataField: field, isEqualTo: comparedValue, completion: callback)
+    observerHandle = server.bind(whereDataField: field, isEqualTo: comparedValue) { [weak self] (update: [T]) in
+      self?.callback(update: update)
+    }
     objectWillChange = publisher
   }
   
