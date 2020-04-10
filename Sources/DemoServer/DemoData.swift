@@ -18,7 +18,7 @@ public struct DemoDemoData: Fusable {
   public var test = "test"
 }
 
-extension Storable {
+extension Fusable {
   public static var serverVersionString: String { "test" }
 
 }

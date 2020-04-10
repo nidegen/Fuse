@@ -12,10 +12,10 @@ import XCTest
 
 
 class TestClass {
-  @Binding(server: testServer)
+  @Fusing(server: testServer)
   var testData = TestData(id: "1", name: "1")
   
-  @OptionalBinding(id: "sdf", server: testServer)
+  @OptionalFusing(id: "sdf", server: testServer)
   var data: TestData?
 }
 

@@ -12,8 +12,8 @@ import XCTest
 
 
 class TestArrayClass {
-  @ArrayBinding(server: testServer, whereDataField: "name", isEqualTo: "Peter")
-  var testData = [TestData]()
+  @ArrayFusing(server: testServer, whereDataField: "name", isEqualTo: "Peter")
+  var testData: [TestData]
 }
 
 class ArrayFusingTests: XCTestCase {
