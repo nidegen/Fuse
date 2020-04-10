@@ -17,8 +17,8 @@ class DemoBindingHandler: BindingHandler {
   
   var typeId: Id = ""
   
-  var valueCallback: (Storable?) -> () = { data in }
-  var arrayCallback: ([Storable]) -> () = { data in }
+  var valueCallback: (Fusable?) -> () = { data in }
+  var arrayCallback: ([Fusable]) -> () = { data in }
   
   func remove() {
     server.bindingHandlers.remove(self)
@@ -30,7 +30,7 @@ class DemoBindingHandler: BindingHandler {
   
   var observedIds: [Id]?
   
-  func updated(value: Storable) {
+  func updated(value: Fusable) {
     
     if observedIds?.contains(value.id) ?? false {
         valueCallback(value)
@@ -60,7 +60,7 @@ public class DemoServer: Server {
   
   public init(){}
   
-  var typeStore = [Id: [Id: Storable]]()
+  var typeStore = [Id: [Id: Fusable]]()
   
   var bindingHandlers = Set<DemoBindingHandler>()
   
@@ -68,7 +68,7 @@ public class DemoServer: Server {
     case value, array, filteredArray, typedArray
   }
     
-  public func set(_ storable: Storable) {
+  public func set(_ storable: Fusable) {
     if typeStore[type(of: storable).typeId] == nil {
       typeStore[type(of: storable).typeId] = [storable.id: storable]
     } else {
@@ -77,25 +77,25 @@ public class DemoServer: Server {
     bindingHandlers.forEach { $0.updated(value: storable)}
   }
   
-  public func delete(_ id: Id, forDataType type: Storable.Type, completion: ((Error?) -> ())?) {
+  public func delete(_ id: Id, forDataType type: Fusable.Type, completion: ((Error?) -> ())?) {
     typeStore[type.typeId]?[id] = nil
   }
   
-  public func get(dataOfType type: Storable.Type, whereDataField dataField: String, isEqualTo value: Any, orderField: String?, descendingOrder: Bool, completion: @escaping ([Storable]) -> ()) {
+  public func get(dataOfType type: Fusable.Type, whereDataField dataField: String, isEqualTo value: Any, orderField: String?, descendingOrder: Bool, completion: @escaping ([Fusable]) -> ()) {
     completion(typeStore[type.typeId]?.compactMap { return $1 } ?? [])
   }
   
-  public func get(ids: [Id], ofDataType type: Storable.Type, completion: @escaping ([Storable]) -> ()) {
+  public func get(ids: [Id], ofDataType type: Fusable.Type, completion: @escaping ([Fusable]) -> ()) {
     completion(typeStore[type.typeId]?.compactMap { return ids.contains($0) ? $1 : nil } ?? [])
   }
   
-  public func get(id: Id, ofDataType type: Storable.Type, completion: @escaping (Storable?) -> ()) {
+  public func get(id: Id, ofDataType type: Fusable.Type, completion: @escaping (Fusable?) -> ()) {
     let typeId = type.typeId
     let first = (typeStore[typeId]?.compactMap { return id == $0 ? $1 : nil } ?? []).first { $0.id == id }
     completion(first)
   }
   
-  public func bind(toId id: Id, ofDataType type: Storable.Type, completion: @escaping (Storable?) -> ()) -> BindingHandler {
+  public func bind(toId id: Id, ofDataType type: Fusable.Type, completion: @escaping (Fusable?) -> ()) -> BindingHandler {
     completion(typeStore[type.typeId]?[id])
     let handler = DemoBindingHandler(server: self)
     handler.server = self
@@ -106,7 +106,7 @@ public class DemoServer: Server {
     return handler
   }
   
-  public func bind(dataOfType type: Storable.Type, whereDataField dataField: String, isEqualTo value: Any, orderField: String?, descendingOrder: Bool, completion: @escaping ([Storable]) -> ()) -> BindingHandler {
+  public func bind(dataOfType type: Fusable.Type, whereDataField dataField: String, isEqualTo value: Any, orderField: String?, descendingOrder: Bool, completion: @escaping ([Fusable]) -> ()) -> BindingHandler {
     let handler = DemoBindingHandler(server: self)
     handler.server = self
     handler.typeId = type.typeId
@@ -126,7 +126,7 @@ public class DemoServer: Server {
   }
   
   
-  public func bind(dataOfType type: Storable.Type, whereDataField dataField: String, contains value: Any, completion: @escaping ([Storable]) -> ()) -> BindingHandler {
+  public func bind(dataOfType type: Fusable.Type, whereDataField dataField: String, contains value: Any, completion: @escaping ([Fusable]) -> ()) -> BindingHandler {
     let handler = DemoBindingHandler(server: self)
     handler.server = self
     handler.typeId = type.typeId
@@ -145,7 +145,7 @@ public class DemoServer: Server {
     return handler
   }
   
-  public func bind(toIds ids: [Id], ofDataType type: Storable.Type,  completion: @escaping ([Storable]) -> ()) -> BindingHandler {
+  public func bind(toIds ids: [Id], ofDataType type: Fusable.Type,  completion: @escaping ([Fusable]) -> ()) -> BindingHandler {
     let handler = DemoBindingHandler(server: self)
     handler.server = self
     handler.typeId = type.typeId
@@ -155,7 +155,7 @@ public class DemoServer: Server {
     return handler
   }
   
-  public func bind(toDataType type: Storable.Type, completion: @escaping ([Storable]) -> ()) -> BindingHandler {
+  public func bind(toDataType type: Fusable.Type, completion: @escaping ([Fusable]) -> ()) -> BindingHandler {
     let handler = DemoBindingHandler(server: self)
     handler.server = self
     handler.typeId = type.typeId

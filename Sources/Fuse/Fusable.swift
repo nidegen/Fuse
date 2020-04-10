@@ -1,5 +1,5 @@
 //
-//  Storable.swift
+//  Fusable.swift
 //  Fuse
 //
 //  Created by Nicolas Degen on 19.03.20.
@@ -10,19 +10,21 @@ import Foundation
 
 public typealias Id = String
 
-public protocol Storable: Codable {
+typealias Storable = Fusable
+
+public protocol Fusable: Codable {
   static var typeId: Id { get }
   static var serverVersionString: String { get }
   var id: Id { get }
 }
 
 // Note: to access the variable's actual type, use type(of: storable).typeId
-public extension Storable {
+public extension Fusable {
   static var typeId: String {
     return "\(self)".deletingSuffix("Data").camelCaseToSnakeCase()
   }
   
-  static func decode(fromData data: Data) throws -> Storable {
+  static func decode(fromData data: Data) throws -> Fusable {
     return try JSONDecoder().decode(self, from: data)
   }
   
@@ -32,7 +34,7 @@ public extension Storable {
     hasher.combine(id)
   }
   
-  static func ==(lhs: Storable, rhs: Storable) -> Bool {
+  static func ==(lhs: Fusable, rhs: Fusable) -> Bool {
     return lhs.id == rhs.id
   }
 }

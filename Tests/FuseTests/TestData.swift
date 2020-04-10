@@ -8,7 +8,7 @@
 
 import Fuse
 
-struct TestData: Storable {
+struct TestData: Fusable {
   let id: Id
   var name: String
   
@@ -17,7 +17,7 @@ struct TestData: Storable {
   }
 }
 
-struct TestTestData: Storable {
+struct TestTestData: Fusable {
   let id: Id
   var name: String
 }

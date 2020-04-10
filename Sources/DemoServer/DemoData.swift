@@ -8,12 +8,12 @@
 
 import Fuse
 
-public struct DemoData: Storable, Equatable {
+public struct DemoData: Fusable, Equatable {
   public var id: Id
   public var age = 0
 }
 
-public struct DemoDemoData: Storable {
+public struct DemoDemoData: Fusable {
   public var id: Id
   public var test = "test"
 }

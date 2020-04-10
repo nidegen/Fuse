@@ -9,7 +9,7 @@
 import Combine
 
 @propertyWrapper
-public class ArrayFusing<T:Storable> {
+public class ArrayFusing<T:Fusable> {
   var data: [T]
   var observerHandle: BindingHandler!
   var server: Server

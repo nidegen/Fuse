@@ -9,7 +9,7 @@
 import Combine
 
 @propertyWrapper
-public class Fusing<T:Storable> {
+public class Fusing<T:Fusable> {
   var data: T
   var observerHandle: BindingHandler!
   var server: Server
@@ -102,7 +102,7 @@ public class Fusing<T:Storable> {
 
 
 @propertyWrapper
-public class OptionalFusing<T:Storable> {
+public class OptionalFusing<T:Fusable> {
   var data: T?
   var observerHandle: BindingHandler!
   var server: Server
