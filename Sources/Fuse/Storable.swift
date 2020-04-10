@@ -43,7 +43,7 @@ extension String {
     return String(self.dropLast(suffix.count))
   }
   
-  func camelCaseToSnakeCase() -> String {
+  public func camelCaseToSnakeCase() -> String {
     let acronymPattern = "([A-Z]+)([A-Z][a-z]|[0-9])"
     let normalPattern = "([a-z0-9])([A-Z])"
     return self.processCamalCaseRegex(pattern: acronymPattern)?
