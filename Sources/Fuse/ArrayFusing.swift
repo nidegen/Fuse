@@ -23,18 +23,18 @@ public class ArrayFusing<T:Fusable> {
     objectWillChange = publisher
   }
 
-  public init(server: Server, publisher: ObservableObjectPublisher? = nil) {
+  public init(server: Server? = nil, publisher: ObservableObjectPublisher? = nil) {
     self.data = [T]()
-    self.server = server
+    self.server = server ?? DefaultServerContainer.server!
     observerHandle = server.bind() { [weak self] (update: [T]) in
       self?.callback(update: update)
     }
     objectWillChange = publisher
   }
 
-  public init(server: Server, whereDataField field: String, contains comparedValue: Any, publisher: ObservableObjectPublisher? = nil) {
+  public init(server: Server? = nil, whereDataField field: String, contains comparedValue: Any, publisher: ObservableObjectPublisher? = nil) {
     self.data = [T]()
-    self.server = server
+    self.server = server ?? DefaultServerContainer.server!
     observerHandle = server.bind(whereDataField: field, isEqualTo: comparedValue) { [weak self] (update: [T]) in
       self?.callback(update: update)
     }
