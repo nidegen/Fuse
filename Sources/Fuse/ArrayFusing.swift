@@ -14,8 +14,6 @@ public class ArrayFusing<T:Fusable> {
   var observerHandle: BindingHandler!
   var server: Server
   
-  var setIsInternal = false
-
   public init(server: Server? = nil, whereDataField field: String, isEqualTo comparedValue: Any, publisher: ObservableObjectPublisher? = nil) {
     self.data = [T]()
     self.server = server ?? DefaultServerContainer.server!
@@ -44,10 +42,8 @@ public class ArrayFusing<T:Fusable> {
   }
   
   func callback(update: [T]) {
-    setIsInternal = true
     self.objectWillChange?.send()
     self.data = update
-    setIsInternal = false
   }
   
   public var wrappedValue: [T] {
@@ -58,9 +54,7 @@ public class ArrayFusing<T:Fusable> {
     set {
       objectWillChange?.send()
       data = newValue
-      if !setIsInternal {
-        server.set(data)
-      }
+      server.set(data)
     }
   }
 

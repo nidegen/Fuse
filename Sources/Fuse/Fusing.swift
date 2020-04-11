@@ -13,9 +13,7 @@ public class Fusing<T:Fusable> {
   var data: T
   var observerHandle: BindingHandler!
   var server: Server
-  
-  var setIsInternal = false
-  
+    
   public init(wrappedValue value: T, server: Server? = nil, publisher: ObservableObjectPublisher? = nil) {
     self.data = value
     self.server = server ?? DefaultServerContainer.server!
@@ -28,10 +26,8 @@ public class Fusing<T:Fusable> {
   
   func callback(update: T?) {
     update.map {
-      setIsInternal = true
       self.objectWillChange?.send()
       self.data = $0
-      setIsInternal = false
     }
   }
   
@@ -43,9 +39,7 @@ public class Fusing<T:Fusable> {
     set {
       objectWillChange?.send()
       data = newValue
-      if !setIsInternal {
-        server.set(data)
-      }
+      server.set(data)
       publisher?.subject.value = newValue
     }
   }
@@ -114,8 +108,6 @@ public class OptionalFusing<T:Fusable> {
   var data: T?
   var observerHandle: BindingHandler!
   var server: Server!
-  
-  var setIsInternal = false
   var id: Id!
   
   public init(id: Id, server: Server? = nil) {
@@ -129,10 +121,8 @@ public class OptionalFusing<T:Fusable> {
   public init(_ option: OptionalFusingOption) {}
   
   func callback(update: T?) {
-    setIsInternal = true
     self.objectWillChange?.send()
     self.data = update
-    setIsInternal = false
   }
   
   public var wrappedValue: T? {
@@ -143,13 +133,11 @@ public class OptionalFusing<T:Fusable> {
     set {
       objectWillChange?.send()
       data = newValue
-      if !setIsInternal {
-        if let data = data {
-          server.set(data)
-        } else {
-          server.delete(id, forDataType: T.self) { error in
-            print(error?.localizedDescription ?? "Error deleting value on server")
-          }
+      if let data = data {
+        server.set(data)
+      } else {
+        server.delete(id, forDataType: T.self) { error in
+          print(error?.localizedDescription ?? "Error deleting value on server")
         }
       }
       publisher?.subject.value = newValue
