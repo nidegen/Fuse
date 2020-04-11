@@ -16,10 +16,10 @@ public class ArrayFusing<T:Fusable> {
   
   var setIsInternal = false
 
-  public init(server: Server, whereDataField field: String, isEqualTo comparedValue: Any, publisher: ObservableObjectPublisher? = nil) {
+  public init(server: Server? = nil, whereDataField field: String, isEqualTo comparedValue: Any, publisher: ObservableObjectPublisher? = nil) {
     self.data = [T]()
-    self.server = server
-    observerHandle = server.bind(whereDataField: field, isEqualTo: comparedValue) { [weak self] (update: [T]) in
+    self.server = server ?? DefaultServerContainer.server!
+    observerHandle = self.server.bind(whereDataField: field, isEqualTo: comparedValue) { [weak self] (update: [T]) in
       self?.callback(update: update)
     }
     objectWillChange = publisher

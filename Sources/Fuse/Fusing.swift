@@ -16,10 +16,13 @@ public class Fusing<T:Fusable> {
   
   var setIsInternal = false
   
-  public init(wrappedValue value: T, server: Server, publisher: ObservableObjectPublisher? = nil) {
+  public init(wrappedValue value: T, server: Server? = nil, publisher: ObservableObjectPublisher? = nil) {
     self.data = value
-    self.server = server
-    self.observerHandle = server.bind(toId: value.id, completion: callback)
+    self.server = server ?? DefaultServerContainer.server!
+    self.observerHandle = self.server.bind(toId: value.id) { [weak self] (update: T?) in
+      self?.callback(update: update)
+    }
+      
     self.objectWillChange = publisher
   }
   
@@ -47,27 +50,27 @@ public class Fusing<T:Fusable> {
   }
   
   public struct Publisher: Combine.Publisher {
-
+    
     public typealias Output = T
-
+    
     public typealias Failure = Never
-
+    
     public func receive<Downstream: Subscriber>(subscriber: Downstream)
       where Downstream.Input == T, Downstream.Failure == Never {
         subject.subscribe(subscriber)
     }
-
+    
     fileprivate let subject: Combine.CurrentValueSubject<T, Never>
-
+    
     fileprivate init(_ output: Output) {
       subject = .init(output)
     }
   }
-
+  
   private var publisher: Publisher?
-
+  
   public var objectWillChange: ObservableObjectPublisher?
-
+  
   public var projectedValue: Publisher {
     get {
       if let publisher = publisher {
@@ -79,26 +82,26 @@ public class Fusing<T:Fusable> {
     }
   }
   
-//  public static subscript<EnclosingSelf: ObservableObject>(
-//    _enclosingInstance object: EnclosingSelf,
-//    wrapped wrappedKeyPath: ReferenceWritableKeyPath<EnclosingSelf, T>,
-//    storage storageKeyPath: ReferenceWritableKeyPath<EnclosingSelf, Self>
-//  ) -> T {
-//    get {
-//      if object[keyPath: storageKeyPath].objectWillChange == nil {
-//        object[keyPath: storageKeyPath].objectWillChange = object.objectWillChange as? ObservableObjectPublisher
-//      }
-//      return object[keyPath: storageKeyPath].wrappedValue
-//    }
-//    set {
-//      if object[keyPath: storageKeyPath].objectWillChange == nil {
-//        object[keyPath: storageKeyPath].objectWillChange = object.objectWillChange as? ObservableObjectPublisher
-//      }
-//      object[keyPath: storageKeyPath].objectWillChange?.send()
-//      object[keyPath: storageKeyPath].publisher?.subject.send(newValue)
-//      object[keyPath: storageKeyPath].wrappedValue = newValue
-//    }
-//  }
+  //  public static subscript<EnclosingSelf: ObservableObject>(
+  //    _enclosingInstance object: EnclosingSelf,
+  //    wrapped wrappedKeyPath: ReferenceWritableKeyPath<EnclosingSelf, T>,
+  //    storage storageKeyPath: ReferenceWritableKeyPath<EnclosingSelf, Self>
+  //  ) -> T {
+  //    get {
+  //      if object[keyPath: storageKeyPath].objectWillChange == nil {
+  //        object[keyPath: storageKeyPath].objectWillChange = object.objectWillChange as? ObservableObjectPublisher
+  //      }
+  //      return object[keyPath: storageKeyPath].wrappedValue
+  //    }
+  //    set {
+  //      if object[keyPath: storageKeyPath].objectWillChange == nil {
+  //        object[keyPath: storageKeyPath].objectWillChange = object.objectWillChange as? ObservableObjectPublisher
+  //      }
+  //      object[keyPath: storageKeyPath].objectWillChange?.send()
+  //      object[keyPath: storageKeyPath].publisher?.subject.send(newValue)
+  //      object[keyPath: storageKeyPath].wrappedValue = newValue
+  //    }
+  //  }
 }
 
 public enum OptionalFusingOption {
@@ -113,11 +116,11 @@ public class OptionalFusing<T:Fusable> {
   
   var setIsInternal = false
   var id: Id!
-    
-  public init(id: Id, server: Server) {
+  
+  public init(id: Id, server: Server? = nil) {
     self.id = id
-    self.server = server
-    self.observerHandle = server.bind(toId: id) { [weak self] (update: T?) in
+    self.server = server ?? DefaultServerContainer.server!
+    self.observerHandle = self.server.bind(toId: id) { [weak self] (update: T?) in
       self?.callback(update: update)
     }
   }
@@ -152,27 +155,27 @@ public class OptionalFusing<T:Fusable> {
   }
   
   public struct Publisher: Combine.Publisher {
-
+    
     public typealias Output = T?
-
+    
     public typealias Failure = Never
-
+    
     public func receive<Downstream: Subscriber>(subscriber: Downstream)
       where Downstream.Input == T?, Downstream.Failure == Never {
         subject.subscribe(subscriber)
     }
-
+    
     fileprivate let subject: Combine.CurrentValueSubject<T?, Never>
-
+    
     fileprivate init(_ output: Output) {
       subject = .init(output)
     }
   }
-
+  
   private var publisher: Publisher?
-
+  
   public var objectWillChange: ObservableObjectPublisher?
-
+  
   public var projectedValue: Publisher {
     get {
       if let publisher = publisher {
@@ -184,24 +187,24 @@ public class OptionalFusing<T:Fusable> {
     }
   }
   
-//  public static subscript<EnclosingSelf: ObservableObject>(
-//    _enclosingInstance object: EnclosingSelf,
-//    wrapped wrappedKeyPath: ReferenceWritableKeyPath<EnclosingSelf, T>,
-//    storage storageKeyPath: ReferenceWritableKeyPath<EnclosingSelf, Self>
-//  ) -> T {
-//    get {
-//      if object[keyPath: storageKeyPath].objectWillChange == nil {
-//        object[keyPath: storageKeyPath].objectWillChange = object.objectWillChange as? ObservableObjectPublisher
-//      }
-//      return object[keyPath: storageKeyPath].wrappedValue
-//    }
-//    set {
-//      if object[keyPath: storageKeyPath].objectWillChange == nil {
-//        object[keyPath: storageKeyPath].objectWillChange = object.objectWillChange as? ObservableObjectPublisher
-//      }
-//      object[keyPath: storageKeyPath].objectWillChange?.send()
-//      object[keyPath: storageKeyPath].publisher?.subject.send(newValue)
-//      object[keyPath: storageKeyPath].wrappedValue = newValue
-//    }
-//  }
+  //  public static subscript<EnclosingSelf: ObservableObject>(
+  //    _enclosingInstance object: EnclosingSelf,
+  //    wrapped wrappedKeyPath: ReferenceWritableKeyPath<EnclosingSelf, T>,
+  //    storage storageKeyPath: ReferenceWritableKeyPath<EnclosingSelf, Self>
+  //  ) -> T {
+  //    get {
+  //      if object[keyPath: storageKeyPath].objectWillChange == nil {
+  //        object[keyPath: storageKeyPath].objectWillChange = object.objectWillChange as? ObservableObjectPublisher
+  //      }
+  //      return object[keyPath: storageKeyPath].wrappedValue
+  //    }
+  //    set {
+  //      if object[keyPath: storageKeyPath].objectWillChange == nil {
+  //        object[keyPath: storageKeyPath].objectWillChange = object.objectWillChange as? ObservableObjectPublisher
+  //      }
+  //      object[keyPath: storageKeyPath].objectWillChange?.send()
+  //      object[keyPath: storageKeyPath].publisher?.subject.send(newValue)
+  //      object[keyPath: storageKeyPath].wrappedValue = newValue
+  //    }
+  //  }
 }

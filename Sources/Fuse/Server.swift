@@ -12,6 +12,10 @@ public protocol BindingHandler: class {
   func remove()
 }
 
+public struct DefaultServerContainer {
+  public static var server: Server?
+}
+
 public protocol Server: class {
   func set(_ storables: [Fusable])
   func set(_ storable: Fusable)
