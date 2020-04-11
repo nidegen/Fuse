@@ -122,7 +122,7 @@ public class OptionalFusing<T:Fusable> {
     }
   }
   
-  public init(_ option: OptionalFusing) {}
+  public init(_ option: OptionalFusingOption) {}
   
   func callback(update: T?) {
     setIsInternal = true
