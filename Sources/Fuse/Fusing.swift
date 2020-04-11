@@ -16,10 +16,11 @@ public class Fusing<T:Fusable> {
   
   var setIsInternal = false
   
-  public init(wrappedValue value: T, server: Server, publisher:ObservableObjectPublisher? = nil) {
+  public init(wrappedValue value: T, server: Server, publisher: ObservableObjectPublisher? = nil) {
     self.data = value
     self.server = server
     self.observerHandle = server.bind(toId: value.id, completion: callback)
+    self.objectWillChange = publisher
   }
   
   func callback(update: T?) {
@@ -65,7 +66,7 @@ public class Fusing<T:Fusable> {
 
   private var publisher: Publisher?
 
-  internal var objectWillChange: ObservableObjectPublisher?
+  public var objectWillChange: ObservableObjectPublisher?
 
   public var projectedValue: Publisher {
     get {
@@ -165,7 +166,7 @@ public class OptionalFusing<T:Fusable> {
 
   private var publisher: Publisher?
 
-  internal var objectWillChange: ObservableObjectPublisher?
+  public var objectWillChange: ObservableObjectPublisher?
 
   public var projectedValue: Publisher {
     get {
