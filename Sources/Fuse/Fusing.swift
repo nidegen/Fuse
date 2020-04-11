@@ -101,6 +101,9 @@ public class Fusing<T:Fusable> {
 //  }
 }
 
+public enum OptionalFusingOption {
+  case nilFusing
+}
 
 @propertyWrapper
 public class OptionalFusing<T:Fusable> {
@@ -119,7 +122,7 @@ public class OptionalFusing<T:Fusable> {
     }
   }
   
-  public init() {}
+  public init(_ option: OptionalFusing) {}
   
   func callback(update: T?) {
     setIsInternal = true
