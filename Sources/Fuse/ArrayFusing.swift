@@ -45,6 +45,7 @@ public class ArrayFusing<T:Fusable> {
   
   func callback(update: [T]) {
     setIsInternal = true
+    self.objectWillChange?.send()
     self.data = update
     setIsInternal = false
   }

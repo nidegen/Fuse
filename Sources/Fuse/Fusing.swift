@@ -29,6 +29,7 @@ public class Fusing<T:Fusable> {
   func callback(update: T?) {
     update.map {
       setIsInternal = true
+      self.objectWillChange?.send()
       self.data = $0
       setIsInternal = false
     }
@@ -129,6 +130,7 @@ public class OptionalFusing<T:Fusable> {
   
   func callback(update: T?) {
     setIsInternal = true
+    self.objectWillChange?.send()
     self.data = update
     setIsInternal = false
   }
