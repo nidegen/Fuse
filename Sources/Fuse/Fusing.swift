@@ -106,10 +106,10 @@ public class Fusing<T:Fusable> {
 public class OptionalFusing<T:Fusable> {
   var data: T?
   var observerHandle: BindingHandler!
-  var server: Server
+  var server: Server!
   
   var setIsInternal = false
-  var id: Id
+  var id: Id!
     
   public init(id: Id, server: Server) {
     self.id = id
@@ -118,6 +118,8 @@ public class OptionalFusing<T:Fusable> {
       self?.callback(update: update)
     }
   }
+  
+  public init() {}
   
   func callback(update: T?) {
     setIsInternal = true
