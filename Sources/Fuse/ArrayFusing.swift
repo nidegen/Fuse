@@ -40,6 +40,8 @@ public class ArrayFusing<T:Fusable> {
     }
     objectWillChange = publisher
   }
+
+  public init(_ option: FusingOption) {}
   
   func callback(update: [T]) {
     self.objectWillChange?.send()

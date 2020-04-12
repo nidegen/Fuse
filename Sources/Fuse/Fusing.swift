@@ -99,7 +99,7 @@ public class Fusing<T:Fusable> {
   //  }
 }
 
-public enum OptionalFusingOption {
+public enum FusingOption {
   case nilFusing
 }
 
@@ -118,7 +118,16 @@ public class OptionalFusing<T:Fusable> {
     }
   }
   
-  public init(_ option: OptionalFusingOption) {}
+  public init(_ data: T, server: Server? = nil) {
+    self.id = data.id
+    self.data = data
+    self.server = server ?? DefaultServerContainer.server!
+    self.observerHandle = self.server.bind(toId: id) { [weak self] (update: T?) in
+      self?.callback(update: update)
+    }
+  }
+  
+  public init(_ option: FusingOption) {}
   
   func callback(update: T?) {
     self.objectWillChange?.send()
