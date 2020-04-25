@@ -108,7 +108,7 @@ public class OptionalFusing<T:Fusable> {
   var data: T?
   var observerHandle: BindingHandler!
   var server: Server!
-  var id: Id!
+  var id: Id?
   
   public init(id: Id, server: Server? = nil) {
     self.id = id
@@ -122,7 +122,7 @@ public class OptionalFusing<T:Fusable> {
     self.id = data.id
     self.data = data
     self.server = server ?? DefaultServerContainer.server!
-    self.observerHandle = self.server.bind(toId: id) { [weak self] (update: T?) in
+    self.observerHandle = self.server.bind(toId: data.id) { [weak self] (update: T?) in
       self?.callback(update: update)
     }
   }
@@ -142,14 +142,15 @@ public class OptionalFusing<T:Fusable> {
     set {
       objectWillChange?.send()
       data = newValue
+      publisher?.subject.value = newValue
       if let data = data {
         server.set(data)
       } else {
+        guard let id = id else { return }
         server.delete(id, forDataType: T.self) { error in
           print(error?.localizedDescription ?? "Error deleting value on server")
         }
       }
-      publisher?.subject.value = newValue
     }
   }
   
