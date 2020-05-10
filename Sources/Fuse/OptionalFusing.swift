@@ -42,6 +42,7 @@ public class OptionalFusing<T:Fusable> {
   func bindToData(data: T) {
     self.id = data.id
     self.data = data
+    self.server.set(data)
     self.observerHandle = self.server.bind(toId: data.id) { [weak self] (update: T?) in
       self?.callback(update: update)
     }
@@ -69,6 +70,7 @@ public class OptionalFusing<T:Fusable> {
             error.map { print($0.localizedDescription) }
           }
         }
+        self.id = nil
       }
     }
   }
