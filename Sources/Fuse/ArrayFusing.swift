@@ -16,7 +16,7 @@ public class ArrayFusing<T:Fusable> {
   
   public init(server: Server? = nil, whereDataField field: String, isEqualTo comparedValue: Any, publisher: ObservableObjectPublisher? = nil) {
     self.data = [T]()
-    self.server = server ?? DefaultServerContainer.server!
+    self.server = server ?? DefaultServerContainer.server
     observerHandle = self.server.bind(whereDataField: field, isEqualTo: comparedValue) { [weak self] (update: [T]) in
       self?.callback(update: update)
     }
@@ -25,7 +25,7 @@ public class ArrayFusing<T:Fusable> {
 
   public init(server: Server? = nil, publisher: ObservableObjectPublisher? = nil) {
     self.data = [T]()
-    self.server = server ?? DefaultServerContainer.server!
+    self.server = server ?? DefaultServerContainer.server
     observerHandle = server?.bind() { [weak self] (update: [T]) in
       self?.callback(update: update)
     }
@@ -34,7 +34,7 @@ public class ArrayFusing<T:Fusable> {
 
   public init(server: Server? = nil, whereDataField field: String, contains comparedValue: Any, publisher: ObservableObjectPublisher? = nil) {
     self.data = [T]()
-    self.server = server ?? DefaultServerContainer.server!
+    self.server = server ?? DefaultServerContainer.server
     observerHandle = server?.bind(whereDataField: field, isEqualTo: comparedValue) { [weak self] (update: [T]) in
       self?.callback(update: update)
     }

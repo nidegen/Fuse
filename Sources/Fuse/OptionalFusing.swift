@@ -2,60 +2,89 @@
 //  Fusing.swift
 //  Fuse
 //
-//  Created by Nicolas Degen on 20.03.20.
+//  Created by Nicolas Degen on 10.05.20.
 //  Copyright © 2020 Nicolas Degen. All rights reserved.
 //
 
 import Combine
 
+public enum FusingOption {
+  case nilFusing
+}
+
 @propertyWrapper
-public class Fusing<T:Fusable> {
-  var data: T
+public class OptionalFusing<T:Fusable> {
+  var data: T?
   var observerHandle: BindingHandler!
-  var server: Server
-    
-  public init(wrappedValue value: T, server: Server? = nil, publisher: ObservableObjectPublisher? = nil) {
-    self.data = value
+  var server: Server!
+  var id: Id?
+  
+  public init(id: Id, server: Server? = nil) {
+    self.id = id
     self.server = server ?? DefaultServerContainer.server
-    self.observerHandle = self.server.bind(toId: value.id) { [weak self] (update: T?) in
+    self.observerHandle = self.server.bind(toId: id) { [weak self] (update: T?) in
       self?.callback(update: update)
     }
-      
-    self.objectWillChange = publisher
   }
   
+  public init(_ data: T, server: Server? = nil) {
+    self.server = server ?? DefaultServerContainer.server
+    bindToData(data: data)
+  }
+  
+  public init(_ option: FusingOption) {}
+  
   func callback(update: T?) {
-    update.map {
-      self.objectWillChange?.send()
-      self.data = $0
+    self.objectWillChange?.send()
+    self.data = update
+  }
+  
+  func bindToData(data: T) {
+    self.id = data.id
+    self.data = data
+    self.observerHandle = self.server.bind(toId: data.id) { [weak self] (update: T?) in
+      self?.callback(update: update)
     }
   }
   
-  public var wrappedValue: T {
+  public var wrappedValue: T? {
     get {
       return data
     }
     
     set {
       objectWillChange?.send()
-      data = newValue
-      server.set(data)
       publisher?.subject.value = newValue
+      
+      if let data = newValue {
+        if id == nil || id == data.id {
+          bindToData(data: data)
+        } else {
+          print("Error: Data with non-matching Id assigned to Optional Fusing. Ignoring")
+          return
+        }
+      } else {
+        if let id = self.id {
+          server.delete(id, forDataType: T.self) { error in
+            error.map { print($0.localizedDescription) }
+          }
+        }
+      }
     }
   }
   
   public struct Publisher: Combine.Publisher {
     
-    public typealias Output = T
+    public typealias Output = T?
     
     public typealias Failure = Never
     
     public func receive<Downstream: Subscriber>(subscriber: Downstream)
-      where Downstream.Input == T, Downstream.Failure == Never {
+      where Downstream.Input == T?, Downstream.Failure == Never {
         subject.subscribe(subscriber)
     }
     
-    fileprivate let subject: Combine.CurrentValueSubject<T, Never>
+    fileprivate let subject: Combine.CurrentValueSubject<T?, Never>
     
     fileprivate init(_ output: Output) {
       subject = .init(output)

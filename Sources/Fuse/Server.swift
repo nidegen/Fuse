@@ -13,7 +13,16 @@ public protocol BindingHandler: class {
 }
 
 public struct DefaultServerContainer {
-  public static var server: Server?
+  static var _server: Server?
+  public static var server: Server {
+    get {
+      return _server!
+    }
+    
+    set {
+      _server = newValue
+    }
+  }
 }
 
 public protocol Server: class {
