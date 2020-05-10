@@ -70,6 +70,7 @@ public class OptionalFusing<T:Fusable> {
             error.map { print($0.localizedDescription) }
           }
         }
+        observerHandle = nil
         self.id = nil
       }
     }
