@@ -59,7 +59,12 @@ public class OptionalFusing<T:Fusable> {
       
       if let data = newValue {
         if id == nil || id == data.id {
-          bindToData(data: data)
+          if observerHandle == nil {
+            bindToData(data: data)
+          } else {
+            self.server.set(data)
+            self.data = data
+          }
         } else {
           print("Error: Data with non-matching Id assigned to Optional Fusing. Ignoring")
           return
