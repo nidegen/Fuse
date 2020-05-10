@@ -70,12 +70,12 @@ public class OptionalFusing<T:Fusable> {
           return
         }
       } else {
+        observerHandle = nil
         if let id = self.id {
           server.delete(id, forDataType: T.self) { error in
             error.map { print($0.localizedDescription) }
           }
         }
-        observerHandle = nil
         self.id = nil
       }
     }
