@@ -70,6 +70,7 @@ public class OptionalFusing<T:Fusable> {
           return
         }
       } else {
+        data = nil
         observerHandle = nil
         if let id = self.id {
           server.delete(id, forDataType: T.self) { error in
