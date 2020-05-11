@@ -12,7 +12,7 @@ import Combine
 public class ArrayFusing<T:Fusable> {
   var data: [T]
   var observerHandle: BindingHandler!
-  var server: Server!
+  var server: Server
   
   public init(server: Server? = nil, whereDataField field: String, isEqualTo comparedValue: Any, publisher: ObservableObjectPublisher? = nil) {
     self.data = [T]()
@@ -41,8 +41,9 @@ public class ArrayFusing<T:Fusable> {
     objectWillChange = publisher
   }
 
-  public init(_ option: FusingOption) {
-    data = []
+  public init(_ option: FusingOption, server: Server? = nil) {
+    self.server = server ?? DefaultServerContainer.server
+    self.data = []
   }
   
   func callback(update: [T]) {

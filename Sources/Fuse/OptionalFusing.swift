@@ -16,7 +16,7 @@ public enum FusingOption {
 public class OptionalFusing<T:Fusable> {
   var data: T?
   var observerHandle: BindingHandler!
-  var server: Server!
+  var server: Server
   var id: Id?
   
   public init(id: Id, server: Server? = nil) {
@@ -32,7 +32,9 @@ public class OptionalFusing<T:Fusable> {
     bindToData(data: data)
   }
   
-  public init(_ option: FusingOption) {}
+  public init(_ option: FusingOption, server: Server? = nil) {
+    self.server = server ?? DefaultServerContainer.server
+  }
   
   func callback(update: T?) {
     self.objectWillChange?.send()
