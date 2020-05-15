@@ -27,9 +27,9 @@ public class OptionalFusing<T:Fusable> {
     }
   }
   
-  public init(_ data: T, server: Server? = nil) {
+  public init(_ data: T, server: Server? = nil, updatingServer: Bool = true) {
     self.server = server ?? DefaultServerContainer.server
-    bindToData(data: data)
+    bindToData(data: data, updatingServer: updatingServer)
   }
   
   public init(_ option: FusingOption, server: Server? = nil) {
@@ -41,10 +41,12 @@ public class OptionalFusing<T:Fusable> {
     self.data = update
   }
   
-  func bindToData(data: T) {
+  func bindToData(data: T, updatingServer: Bool = true) {
     self.id = data.id
     self.data = data
-    self.server.set(data)
+    if updatingServer {
+      self.server.set(data)
+    }
     self.observerHandle = self.server.bind(toId: data.id) { [weak self] (update: T?) in
       self?.callback(update: update)
     }

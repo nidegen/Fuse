@@ -14,10 +14,12 @@ public class Fusing<T:Fusable> {
   var observerHandle: BindingHandler!
   var server: Server
     
-  public init(wrappedValue value: T, server: Server? = nil, publisher: ObservableObjectPublisher? = nil) {
+  public init(wrappedValue value: T, server: Server? = nil, publisher: ObservableObjectPublisher? = nil, updatingServer: Bool = true) {
     self.data = value
     self.server = server ?? DefaultServerContainer.server
-    self.server.set(value)
+    if updatingServer {
+      self.server.set(value)
+    }
     self.observerHandle = self.server.bind(toId: value.id) { [weak self] (update: T?) in
       self?.callback(update: update)
     }
