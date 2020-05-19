@@ -37,6 +37,8 @@ public protocol Server: class {
   
   func bind(toId id: Id, ofDataType type: Fusable.Type, completion: @escaping (Fusable?) -> ()) -> BindingHandler
   
+  func bind(toIds ids: [Id], dataOfType type: Fusable.Type, completion: @escaping ([Fusable]) -> ()) -> BindingHandler
+  
   func bind(dataOfType type: Fusable.Type, whereDataField dataField: String, isEqualTo value: Any, orderField: String?, descendingOrder: Bool, completion: @escaping ([Fusable]) -> ()) -> BindingHandler
   
   func bind(dataOfType type: Fusable.Type, whereDataField dataField: String, contains value: Any, completion: @escaping ([Fusable]) -> ()) -> BindingHandler
@@ -76,6 +78,11 @@ public extension Server {
     }
   }
   
+  func bind<T: Fusable>(toIds ids: [Id], completion: @escaping ([T])->()) -> BindingHandler {
+    return self.bind(toIds: ids, dataOfType : T.self) { data in
+      completion(data as? [T] ?? [])
+    }
+  }
   
   func get<T: Fusable>(whereDataField dataField: String, isEqualTo value: Any, orderField: String? = nil,
                         descendingOrder: Bool = true, completion: @escaping ([T])->()) {

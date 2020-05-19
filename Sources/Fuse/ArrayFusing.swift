@@ -22,6 +22,15 @@ public class ArrayFusing<T:Fusable> {
     }
     objectWillChange = publisher
   }
+  
+  public init(server: Server? = nil, ids: [Id], publisher: ObservableObjectPublisher? = nil) {
+    self.data = [T]()
+    self.server = server ?? DefaultServerContainer.server
+    observerHandle = self.server.bind(toIds: ids) { [weak self] (update: [T]) in
+      self?.callback(update: update)
+    }
+    objectWillChange = publisher
+  }
 
   public init(server: Server? = nil, publisher: ObservableObjectPublisher? = nil) {
     self.data = [T]()

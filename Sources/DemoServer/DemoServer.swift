@@ -145,7 +145,7 @@ public class DemoServer: Server {
     return handler
   }
   
-  public func bind(toIds ids: [Id], ofDataType type: Fusable.Type,  completion: @escaping ([Fusable]) -> ()) -> BindingHandler {
+  public func bind(toIds ids: [Id], dataOfType type: Fusable.Type,  completion: @escaping ([Fusable]) -> ()) -> BindingHandler {
     let handler = DemoBindingHandler(server: self)
     handler.server = self
     handler.typeId = type.typeId
