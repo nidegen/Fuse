@@ -41,6 +41,8 @@ public protocol Server: class {
   
   func bind(dataOfType type: Fusable.Type, whereDataField dataField: String, isEqualTo value: Any, orderField: String?, descendingOrder: Bool, completion: @escaping ([Fusable]) -> ()) -> BindingHandler
   
+  func bind(dataOfType type: Fusable.Type, whereDataField dataField: String, isContainedIn value: [Any], orderField: String?, descendingOrder: Bool, completion: @escaping ([Fusable]) -> ()) -> BindingHandler
+  
   func bind(dataOfType type: Fusable.Type, whereDataField dataField: String, contains value: Any, completion: @escaping ([Fusable]) -> ()) -> BindingHandler
   
   func bind(toDataType type: Fusable.Type, completion: @escaping ([Fusable]) -> ()) -> BindingHandler

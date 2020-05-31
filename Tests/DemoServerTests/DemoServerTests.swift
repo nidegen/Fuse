@@ -12,6 +12,7 @@ import Fuse
 
 final class DemoServerTests: XCTestCase {
   
+  var bindings = [BindingHandler]()
   
   override func setUp() {
   }
@@ -73,14 +74,15 @@ final class DemoServerTests: XCTestCase {
     var inbox = [DemoData?]()
     let data = DemoData(id: "a", age: 12)
     let server = DemoServer()
-    let binding = server.bind(toId: "a") { (received: DemoData?) in
+    bindings += [server.bind(toId: "a") { (received: DemoData?) in
       inbox.append(received)
       if inbox.count == 3 {
         expectation.fulfill()
       } else if inbox.count > 3 {
         nonExpectation.fulfill()
       }
-    }
+    }]
+    
     server.set(data)
     server.set(data)
     server.set(DemoData(id: "a", age: 33))
@@ -94,10 +96,10 @@ final class DemoServerTests: XCTestCase {
     let d = DemoData(id: "d", age: 14)
     let server = DemoServer()
     server.set([a,b,c,d])
-    let binding = server.bind(whereDataField: "age", isEqualTo: 12) { (data: [DemoData]) in
+    bindings += [server.bind(whereDataField: "age", isEqualTo: 12) { (data: [DemoData]) in
       XCTAssert(data.count == 2)
       expectation.fulfill()
-    }
+    }]
     server.set(DemoData(id: "e", age: 1))
   }
 }

@@ -126,6 +126,25 @@ public class DemoServer: Server {
   }
   
   
+  public func bind(dataOfType type: Fusable.Type, whereDataField dataField: String, isContainedIn values: [Any], orderField: String?, descendingOrder: Bool, completion: @escaping ([Fusable]) -> ()) -> BindingHandler {
+    let handler = DemoBindingHandler(server: self)
+    handler.server = self
+    handler.typeId = type.typeId
+    handler.arrayCallback = { storables in
+      let filtered = storables.filter { storable in
+        guard let json = storable.toJSONData() else { return false }
+        guard let dict = ((try? JSONSerialization.jsonObject(with: json, options: .allowFragments)).flatMap { $0 as? [String: Any] }) else { return false }
+        guard let fieldValue = dict[dataField] else { return false }
+        
+        return values.contains { isEqual(a: fieldValue, b: $0, as: Int.self) || isEqual(a: fieldValue, b: $0, as: Double.self) || isEqual(a: fieldValue, b: $0, as: Float.self) || isEqual(a: fieldValue, b: $0, as: String.self) || isEqual(a: fieldValue, b: $0, as: Bool.self) }
+      }
+      let sorted = filtered
+      completion(sorted)
+    }
+    bindingHandlers.insert(handler)
+    return handler
+  }
+  
   public func bind(dataOfType type: Fusable.Type, whereDataField dataField: String, contains value: Any, completion: @escaping ([Fusable]) -> ()) -> BindingHandler {
     let handler = DemoBindingHandler(server: self)
     handler.server = self
