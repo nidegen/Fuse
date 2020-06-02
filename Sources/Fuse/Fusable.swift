@@ -18,17 +18,30 @@ public protocol Fusable: Codable {
   var id: Id { get }
 }
 
+var encoder: JSONEncoder = {
+  let encoder = JSONEncoder()
+  encoder.dateEncodingStrategy = .iso8601
+  return encoder
+}()
+
+var decoder: JSONDecoder = {
+  let decoder = JSONDecoder()
+  decoder.dateDecodingStrategy = .iso8601
+  return decoder
+}()
+
 // Note: to access the variable's actual type, use type(of: storable).typeId
 public extension Fusable {
+  
   static var typeId: String {
     return "\(self)".deletingSuffix("Data").camelCaseToSnakeCase()
   }
   
   static func decode(fromData data: Data) throws -> Fusable {
-    return try JSONDecoder().decode(self, from: data)
+    return try decoder.decode(self, from: data)
   }
   
-  func toJSONData() -> Data? { try? JSONEncoder().encode(self) }
+  func toJSONData() -> Data? { try? encoder.encode(self) }
   
   func hash(into hasher: inout Hasher) {
     hasher.combine(id)
