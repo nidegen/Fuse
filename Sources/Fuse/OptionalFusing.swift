@@ -19,6 +19,8 @@ public class OptionalFusing<T:Fusable> {
   var server: Server
   var id: Id?
   
+  var didUpdate: ((T?)->())?
+  
   public init(id: Id, server: Server? = nil) {
     self.id = id
     self.server = server ?? DefaultServerContainer.server
@@ -38,12 +40,15 @@ public class OptionalFusing<T:Fusable> {
   
   func callback(update: T?) {
     self.objectWillChange?.send()
+    self.publisher?.subject.value = update
     self.data = update
+    self.didUpdate?(update)
   }
   
   func bindToData(data: T, updatingServer: Bool = true) {
     self.id = data.id
     self.data = data
+    self.didUpdate?(data)
     if updatingServer {
       self.server.set(data)
     }
@@ -60,6 +65,7 @@ public class OptionalFusing<T:Fusable> {
     set {
       objectWillChange?.send()
       publisher?.subject.value = newValue
+      self.didUpdate?(newValue)
       
       if let data = newValue {
         if id == nil || id == data.id {

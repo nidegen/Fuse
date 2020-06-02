@@ -13,6 +13,8 @@ public class Fusing<T:Fusable> {
   var data: T
   var observerHandle: BindingHandler!
   var server: Server
+  
+  var didUpdate: ((T)->())?
     
   public init(wrappedValue value: T, server: Server? = nil, publisher: ObservableObjectPublisher? = nil, updatingServer: Bool = true) {
     self.data = value
@@ -30,7 +32,9 @@ public class Fusing<T:Fusable> {
   func callback(update: T?) {
     update.map {
       self.objectWillChange?.send()
+      self.publisher?.subject.value = $0
       self.data = $0
+      self.didUpdate?($0)
     }
   }
   
@@ -43,6 +47,7 @@ public class Fusing<T:Fusable> {
       objectWillChange?.send()
       data = newValue
       server.set(data)
+      didUpdate?(data)
       publisher?.subject.value = newValue
     }
   }
