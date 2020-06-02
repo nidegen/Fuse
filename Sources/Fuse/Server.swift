@@ -54,6 +54,14 @@ public extension Server {
     storables.forEach { set($0) }
   }
   
+  func bind<T: Fusable>(whereDataField dataField: String, isContainedIn values: [Any], orderField: String? = nil,
+                         descendingOrder: Bool = true, completion: @escaping ([T])->()) -> BindingHandler {
+    self.bind(dataOfType: T.self, whereDataField: dataField, isContainedIn: values, orderField: orderField,
+                descendingOrder: descendingOrder) { data in
+                  completion(data as? [T] ?? [])
+    }
+  }
+  
   func bind<T: Fusable>(whereDataField dataField: String, isEqualTo value: Any, orderField: String? = nil,
                          descendingOrder: Bool = true, completion: @escaping ([T])->()) -> BindingHandler {
     self.bind(dataOfType: T.self, whereDataField: dataField, isEqualTo: value, orderField: orderField,

@@ -41,6 +41,15 @@ public class ArrayFusing<T:Fusable> {
     objectWillChange = publisher
   }
 
+  public init(server: Server? = nil, whereDataField field: String, isContainedIn values: [Any], publisher: ObservableObjectPublisher? = nil) {
+    self.data = [T]()
+    self.server = server ?? DefaultServerContainer.server
+    observerHandle = self.server.bind(whereDataField: field, isContainedIn: values) { [weak self] (update: [T]) in
+      self?.callback(update: update)
+    }
+    objectWillChange = publisher
+  }
+
   public init(server: Server? = nil, whereDataField field: String, contains comparedValue: Any, publisher: ObservableObjectPublisher? = nil) {
     self.data = [T]()
     self.server = server ?? DefaultServerContainer.server
