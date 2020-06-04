@@ -8,7 +8,7 @@
 
 import XCTest
 
-@testable import Fuse
+import Fuse
 
 
 class TestClass: ObservableObject {
@@ -26,7 +26,7 @@ class FusingTests: XCTestCase {
     testServer.set(TestData(id: testClass.testData.id, name: "one"))
     XCTAssert(testClass.testData.name == "one")
     testClass.testData.name = "ha"
-    testServer.get(id: "1", ofDataType: TestData.self) { (data: Storable?) in
+    testServer.get(id: "1", ofDataType: TestData.self) { (data: Fusable?) in
       let test = data as? TestData
       XCTAssert(test?.name == "ha")
     }

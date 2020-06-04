@@ -10,8 +10,6 @@ import Foundation
 
 public typealias Id = String
 
-typealias Storable = Fusable
-
 public protocol Fusable: Codable {
   static var typeId: Id { get }
   static var serverVersionString: String { get }
