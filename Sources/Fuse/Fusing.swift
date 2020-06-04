@@ -53,18 +53,18 @@ public class Fusing<T:Fusable> {
   }
   
   public struct Publisher: Combine.Publisher {
-    
+
     public typealias Output = T
-    
+
     public typealias Failure = Never
-    
+
     public func receive<Downstream: Subscriber>(subscriber: Downstream)
       where Downstream.Input == T, Downstream.Failure == Never {
         subject.subscribe(subscriber)
     }
-    
+
     fileprivate let subject: Combine.CurrentValueSubject<T, Never>
-    
+
     fileprivate init(_ output: Output) {
       subject = .init(output)
     }
@@ -85,24 +85,26 @@ public class Fusing<T:Fusable> {
     }
   }
   
-  //  public static subscript<EnclosingSelf: ObservableObject>(
-  //    _enclosingInstance object: EnclosingSelf,
-  //    wrapped wrappedKeyPath: ReferenceWritableKeyPath<EnclosingSelf, T>,
-  //    storage storageKeyPath: ReferenceWritableKeyPath<EnclosingSelf, Self>
-  //  ) -> T {
-  //    get {
-  //      if object[keyPath: storageKeyPath].objectWillChange == nil {
-  //        object[keyPath: storageKeyPath].objectWillChange = object.objectWillChange as? ObservableObjectPublisher
-  //      }
-  //      return object[keyPath: storageKeyPath].wrappedValue
-  //    }
-  //    set {
-  //      if object[keyPath: storageKeyPath].objectWillChange == nil {
-  //        object[keyPath: storageKeyPath].objectWillChange = object.objectWillChange as? ObservableObjectPublisher
-  //      }
-  //      object[keyPath: storageKeyPath].objectWillChange?.send()
-  //      object[keyPath: storageKeyPath].publisher?.subject.send(newValue)
-  //      object[keyPath: storageKeyPath].wrappedValue = newValue
-  //    }
-  //  }
+  public static subscript<EnclosingSelf: ObservableObject>(
+    _enclosingInstance object: EnclosingSelf,
+    wrapped wrappedKeyPath: ReferenceWritableKeyPath<EnclosingSelf, T>,
+    storage storageKeyPath: ReferenceWritableKeyPath<EnclosingSelf, Fusing<T>>
+  ) -> T {
+    get {
+      if object[keyPath: storageKeyPath].objectWillChange == nil {
+        object[keyPath: storageKeyPath].objectWillChange = object.objectWillChange as? ObservableObjectPublisher
+      }
+      return object[keyPath: storageKeyPath].wrappedValue
+    }
+
+    set {
+      (object.objectWillChange as? ObservableObjectPublisher)?.send()
+
+      if object[keyPath: storageKeyPath].objectWillChange == nil {
+        object[keyPath: storageKeyPath].objectWillChange = object.objectWillChange as? ObservableObjectPublisher
+      }
+
+      object[keyPath: storageKeyPath].wrappedValue = newValue
+    }
+  }
 }

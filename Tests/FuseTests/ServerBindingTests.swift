@@ -11,7 +11,7 @@ import XCTest
 @testable import Fuse
 
 
-class TestClass {
+class TestClass: ObservableObject {
   @Fusing(server: testServer)
   var testData = TestData(id: "1", name: "1")
   
