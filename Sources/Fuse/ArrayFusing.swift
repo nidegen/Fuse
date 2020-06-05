@@ -14,6 +14,8 @@ public class ArrayFusing<T:Fusable> {
   var observerHandle: BindingHandler!
   var server: Server
   
+  public var didUpdate: (([T])->())?
+  
   public init(server: Server? = nil, whereDataField field: String, isEqualTo comparedValue: Any, publisher: ObservableObjectPublisher? = nil) {
     self.data = [T]()
     self.server = server ?? DefaultServerContainer.server
@@ -67,6 +69,7 @@ public class ArrayFusing<T:Fusable> {
   func callback(update: [T]) {
     self.objectWillChange?.send()
     self.data = update
+    didUpdate?(update)
   }
   
   public var wrappedValue: [T] {

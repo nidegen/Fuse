@@ -14,7 +14,7 @@ public class Fusing<T:Fusable> {
   var observerHandle: BindingHandler!
   var server: Server
   
-  var didUpdate: ((T)->())?
+  public var didUpdate: ((T)->())?
     
   public init(wrappedValue value: T, server: Server? = nil, publisher: ObservableObjectPublisher? = nil, updatingServer: Bool = true) {
     self.data = value

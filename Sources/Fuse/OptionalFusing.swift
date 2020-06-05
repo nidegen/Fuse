@@ -19,7 +19,7 @@ public class OptionalFusing<T:Fusable> {
   var server: Server
   var id: Id?
   
-  var didUpdate: ((T?)->())?
+  public var didUpdate: ((T?)->())?
   
   public init(id: Id, server: Server? = nil) {
     self.id = id
