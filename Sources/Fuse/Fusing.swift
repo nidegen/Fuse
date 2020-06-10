@@ -85,26 +85,34 @@ public class Fusing<T:Fusable> {
     }
   }
   
-  public static subscript<EnclosingSelf: ObservableObject>(
-    _enclosingInstance object: EnclosingSelf,
-    wrapped wrappedKeyPath: ReferenceWritableKeyPath<EnclosingSelf, T>,
-    storage storageKeyPath: ReferenceWritableKeyPath<EnclosingSelf, Fusing<T>>
-  ) -> T {
-    get {
-      if object[keyPath: storageKeyPath].objectWillChange == nil {
-        object[keyPath: storageKeyPath].objectWillChange = object.objectWillChange as? ObservableObjectPublisher
-      }
-      return object[keyPath: storageKeyPath].wrappedValue
-    }
+ public static subscript<EnclosingSelf>(
+   _enclosingInstance object: EnclosingSelf,
+   wrapped wrappedKeyPath: ReferenceWritableKeyPath<EnclosingSelf, T>,
+   storage storageKeyPath: ReferenceWritableKeyPath<EnclosingSelf, Fusing<T>>
+ ) -> T {
+   get {
+     if object[keyPath: storageKeyPath].objectWillChange == nil {
+       object[keyPath: storageKeyPath].objectWillChange = getObservablePublisher(object)
+     }
+     return object[keyPath: storageKeyPath].wrappedValue
+   }
 
-    set {
-      (object.objectWillChange as? ObservableObjectPublisher)?.send()
+   set {
+     if object[keyPath: storageKeyPath].objectWillChange == nil {
+       object[keyPath: storageKeyPath].objectWillChange = getObservablePublisher(object)
+     }
+     
+     object[keyPath: storageKeyPath].objectWillChange?.send()
 
-      if object[keyPath: storageKeyPath].objectWillChange == nil {
-        object[keyPath: storageKeyPath].objectWillChange = object.objectWillChange as? ObservableObjectPublisher
-      }
+     object[keyPath: storageKeyPath].wrappedValue = newValue
+   }
+ }
+}
 
-      object[keyPath: storageKeyPath].wrappedValue = newValue
-    }
-  }
+func getObservablePublisher<T:ObservableObject>(_ observable: T) -> ObservableObjectPublisher? {
+  return observable.objectWillChange as? ObservableObjectPublisher
+}
+
+func getObservablePublisher<T>(_ observable: T) -> ObservableObjectPublisher? {
+  return nil
 }
