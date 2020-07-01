@@ -15,6 +15,9 @@ class TestClass {
   @Fusing(server: testServer)
   var testData = TestData(id: "1", name: "1")
   
+  @OptionalFuser(id: "1", server: testServer)
+  var fuserTestData: TestData?
+  
   @OptionalFusing(id: "sdf", server: testServer)
   var data: TestData?
 }
@@ -23,6 +26,7 @@ class FusingTests: XCTestCase {
   func testSetter() {
     let testClass = TestClass()
     XCTAssert(testClass.testData.name == "1")
+    XCTAssert(testClass.fuserTestData?.name ?? "" == "1")
     testServer.set(TestData(id: testClass.testData.id, name: "one"))
     XCTAssert(testClass.testData.name == "one")
     testClass.testData.name = "ha"
