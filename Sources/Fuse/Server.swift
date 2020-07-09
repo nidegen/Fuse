@@ -112,6 +112,20 @@ public extension Server {
       completion((data as? T?) ?? nil)
     }
   }
+  
+  func get<T: Fusable>(id: Id) -> T? {
+    var returnValue: T?
+    let dispatchGroup  = DispatchGroup()
+
+    dispatchGroup.enter()
+    get(id: id, ofDataType: T.self) { data in
+      dispatchGroup.leave()
+      returnValue = data as? T ?? nil
+    }
+
+    dispatchGroup.wait(timeout: .init(uptimeNanoseconds: 1000 * 1000 * 1000))
+    return returnValue
+  }
 }
 
 //protocol Server {

@@ -15,14 +15,11 @@ import DemoServer
 var testServer = DemoServer()
 
 final class FuseTests: XCTestCase {
-  func testExample() {
-    // This is an example of a functional test case.
-    // Use XCTAssert and related functions to verify your tests produce the correct
-    // results.
-    XCTAssertEqual(Fuse().text, "Hello, World!")
-  }
   
-  static var allTests = [
-    ("testExample", testExample),
-  ]
+  func testSetter() {
+    let input = TestData(id: "input", name: "one")
+    testServer.set(input)
+    let output: TestData? = testServer.get(id: "input")
+    XCTAssert(output?.name == input.name)
+  }
 }
