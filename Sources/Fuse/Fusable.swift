@@ -50,6 +50,11 @@ public extension Fusable {
   static func ==(lhs: Fusable, rhs: Fusable) -> Bool {
     return lhs.id == rhs.id
   }
+  
+  var dictionary: [String: Any]? {
+    guard let data = self.toJSONData() else { return nil }
+    return (try? JSONSerialization.jsonObject(with: data, options: .allowFragments)).flatMap { $0 as? [String: Any] }
+  }
 }
 
 extension String {

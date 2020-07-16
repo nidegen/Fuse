@@ -1,5 +1,5 @@
 //
-//  Server.swift
+//  FuseServer.swift
 //  Fuse
 //
 //  Created by Nicolas Degen on 19.03.20.
@@ -14,7 +14,7 @@ public protocol BindingHandler: class {
 
 public struct DefaultServerContainer {
   static var _server: Server?
-  public static var server: Server {
+  public static var server: FuseServer {
     get {
       return _server!
     }
@@ -25,10 +25,14 @@ public struct DefaultServerContainer {
   }
 }
 
-public protocol Server: class {
-  func set(_ storables: [Fusable])
-  func set(_ storable: Fusable)
-  func delete(_ id: Id, forDataType type: Fusable.Type, completion: ((Error?)->())?)
+public typealias Server = FuseServer
+
+public typealias SetterCompletion = ((Error?)->())?
+
+public protocol FuseServer: class {
+  func set(_ storables: [Fusable], completion: SetterCompletion)
+  func set(_ storable: Fusable, completion: SetterCompletion)
+  func delete(_ id: Id, forDataType type: Fusable.Type, completion: SetterCompletion)
   
   func get(dataOfType type: Fusable.Type, whereDataField dataField: String, isEqualTo value: Any, orderField: String?,
            descendingOrder: Bool, completion: @escaping ([Fusable])->())
@@ -51,7 +55,7 @@ public protocol Server: class {
 public extension Server {
   
   func set(_ storables: [Fusable]) {
-    storables.forEach { set($0) }
+    storables.forEach { set($0, completion: nil) }
   }
   
   func bind<T: Fusable>(whereDataField dataField: String, isContainedIn values: [Any], orderField: String? = nil,

@@ -56,8 +56,7 @@ extension DemoBindingHandler: Hashable {
   }
 }
 
-public class DemoServer: Server {
-  
+public class DemoServer: FuseServer {
   public init(){}
   
   var typeStore = [Id: [Id: Fusable]]()
@@ -68,7 +67,7 @@ public class DemoServer: Server {
     case value, array, filteredArray, typedArray
   }
     
-  public func set(_ storable: Fusable) {
+  public func set(_ storable: Fusable, completion: SetterCompletion = nil) {
     if typeStore[type(of: storable).typeId] == nil {
       typeStore[type(of: storable).typeId] = [storable.id: storable]
     } else {
@@ -77,7 +76,13 @@ public class DemoServer: Server {
     bindingHandlers.forEach { $0.updated(value: storable)}
   }
   
-  public func delete(_ id: Id, forDataType type: Fusable.Type, completion: ((Error?) -> ())?) {
+  public func set(_ storables: [Fusable], completion: SetterCompletion = nil) {
+    storables.forEach {
+      self.set($0, completion: completion)
+    }
+  }
+  
+  public func delete(_ id: Id, forDataType type: Fusable.Type, completion: SetterCompletion = nil) {
     typeStore[type.typeId]?[id] = nil
   }
   

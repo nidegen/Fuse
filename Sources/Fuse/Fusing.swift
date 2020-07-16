@@ -20,7 +20,7 @@ public class Fusing<T:Fusable> {
     self.data = value
     self.server = server ?? DefaultServerContainer.server
     if updatingServer {
-      self.server.set(value)
+      self.server.set(value, completion: nil)
     }
     self.observerHandle = self.server.bind(toId: value.id) { [weak self] (update: T?) in
       self?.callback(update: update)
@@ -46,7 +46,7 @@ public class Fusing<T:Fusable> {
     set {
       objectWillChange?.send()
       data = newValue
-      server.set(data)
+      server.set(data, completion: nil)
       didUpdate?(data)
       publisher?.subject.value = newValue
     }

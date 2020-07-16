@@ -50,7 +50,7 @@ public class OptionalFusing<T:Fusable> {
     self.data = data
     self.didUpdate?(data)
     if updatingServer {
-      self.server.set(data)
+      self.server.set(data, completion: nil)
     }
     self.observerHandle = self.server.bind(toId: data.id) { [weak self] (update: T?) in
       self?.callback(update: update)
@@ -72,7 +72,7 @@ public class OptionalFusing<T:Fusable> {
           if observerHandle == nil {
             bindToData(data: data)
           } else {
-            self.server.set(data)
+            self.server.set(data, completion: nil)
             self.data = data
           }
         } else {
