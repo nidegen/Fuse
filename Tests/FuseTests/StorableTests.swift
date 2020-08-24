@@ -7,9 +7,7 @@
 //
 
 import XCTest
-
-import DemoServer
-
+import Debug
 @testable import Fuse
 
 class StorableTests: XCTestCase {

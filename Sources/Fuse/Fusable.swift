@@ -33,6 +33,8 @@ var decoder: JSONDecoder = {
 // Note: to access the variable's actual type, use type(of: storable).typeId
 public extension Fusable {
   
+  static var serverVersionString: String { "undefined" }
+  
   static var typeId: String {
     return "\(self)".deletingSuffix("Data").camelCaseToSnakeCase()
   }

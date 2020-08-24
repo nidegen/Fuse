@@ -1,30 +1,29 @@
 //
-//  DemoServer.swift
-//  DemoServer
+//  DebugServer.swift
+//  Fuse
 //
 //  Created by Nicolas Degen on 20.03.20.
 //  Copyright © 2020 Nicolas Degen. All rights reserved.
 //
 
 import Foundation
-
 import Fuse
 
-class DemoBindingHandler: BindingHandler {
+public class DebugBindingHandler: BindingHandler {
   private let id = UUID().uuidString
   
-  var server: DemoServer
+  var server: DebugServer
   
   var typeId: Id = ""
   
   var valueCallback: (Fusable?) -> () = { data in }
   var arrayCallback: ([Fusable]) -> () = { data in }
   
-  func remove() {
+  public func remove() {
     server.bindingHandlers.remove(self)
   }
   
-  fileprivate init(server: DemoServer) {
+  fileprivate init(server: DebugServer) {
     self.server = server
   }
   
@@ -46,22 +45,22 @@ class DemoBindingHandler: BindingHandler {
   }
 }
 
-extension DemoBindingHandler: Hashable {
-  static func == (lhs: DemoBindingHandler, rhs: DemoBindingHandler) -> Bool {
+extension DebugBindingHandler: Hashable {
+  public static func == (lhs: DebugBindingHandler, rhs: DebugBindingHandler) -> Bool {
     lhs.id == rhs.id
   }
   
-  func hash(into hasher: inout Hasher) {
+  public func hash(into hasher: inout Hasher) {
     hasher.combine(id)
   }
 }
 
-public class DemoServer: FuseServer {
+public class DebugServer: FuseServer {
   public init(){}
   
   var typeStore = [Id: [Id: Fusable]]()
   
-  var bindingHandlers = Set<DemoBindingHandler>()
+  var bindingHandlers = Set<DebugBindingHandler>()
   
   enum BindingTypes {
     case value, array, filteredArray, typedArray
@@ -102,7 +101,7 @@ public class DemoServer: FuseServer {
   
   public func bind(toId id: Id, ofDataType type: Fusable.Type, completion: @escaping (Fusable?) -> ()) -> BindingHandler {
     completion(typeStore[type.typeId]?[id])
-    let handler = DemoBindingHandler(server: self)
+    let handler = DebugBindingHandler(server: self)
     handler.server = self
     handler.typeId = type.typeId
     handler.valueCallback = completion
@@ -112,7 +111,7 @@ public class DemoServer: FuseServer {
   }
   
   public func bind(dataOfType type: Fusable.Type, whereDataField dataField: String, isEqualTo value: Any, orderField: String?, descendingOrder: Bool, completion: @escaping ([Fusable]) -> ()) -> BindingHandler {
-    let handler = DemoBindingHandler(server: self)
+    let handler = DebugBindingHandler(server: self)
     handler.server = self
     handler.typeId = type.typeId
     handler.arrayCallback = { storables in
@@ -132,7 +131,7 @@ public class DemoServer: FuseServer {
   
   
   public func bind(dataOfType type: Fusable.Type, whereDataField dataField: String, isContainedIn values: [Any], orderField: String?, descendingOrder: Bool, completion: @escaping ([Fusable]) -> ()) -> BindingHandler {
-    let handler = DemoBindingHandler(server: self)
+    let handler = DebugBindingHandler(server: self)
     handler.server = self
     handler.typeId = type.typeId
     handler.arrayCallback = { storables in
@@ -151,7 +150,7 @@ public class DemoServer: FuseServer {
   }
   
   public func bind(dataOfType type: Fusable.Type, whereDataField dataField: String, contains value: Any, completion: @escaping ([Fusable]) -> ()) -> BindingHandler {
-    let handler = DemoBindingHandler(server: self)
+    let handler = DebugBindingHandler(server: self)
     handler.server = self
     handler.typeId = type.typeId
     handler.arrayCallback = { storables in
@@ -170,7 +169,7 @@ public class DemoServer: FuseServer {
   }
   
   public func bind(toIds ids: [Id], dataOfType type: Fusable.Type,  completion: @escaping ([Fusable]) -> ()) -> BindingHandler {
-    let handler = DemoBindingHandler(server: self)
+    let handler = DebugBindingHandler(server: self)
     handler.server = self
     handler.typeId = type.typeId
     handler.arrayCallback = completion
@@ -180,7 +179,7 @@ public class DemoServer: FuseServer {
   }
   
   public func bind(toDataType type: Fusable.Type, completion: @escaping ([Fusable]) -> ()) -> BindingHandler {
-    let handler = DemoBindingHandler(server: self)
+    let handler = DebugBindingHandler(server: self)
     handler.server = self
     handler.typeId = type.typeId
     handler.arrayCallback = completion

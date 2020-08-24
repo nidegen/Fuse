@@ -7,12 +7,10 @@
 //
 
 import XCTest
-
-import DemoServer
-
+import Debug
 @testable import Fuse
 
-var testServer = DemoServer()
+var testServer = DebugServer()
 
 final class FuseTests: XCTestCase {
   

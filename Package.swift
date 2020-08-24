@@ -10,7 +10,7 @@ let package = Package(
     // Products define the executables and libraries produced by a package, and make them visible to other packages.
     .library(
       name: "Fuse",
-      targets: ["Fuse"]),
+      targets: ["Fuse", "Debug"]),
   ],
   dependencies: [
     // Dependencies declare other packages that this package depends on.
@@ -23,13 +23,13 @@ let package = Package(
       name: "Fuse",
       dependencies: []),
     .target(
-      name: "DemoServer",
+      name: "Debug",
       dependencies: ["Fuse"]),
     .testTarget(
-      name: "DemoServerTests",
-      dependencies: ["DemoServer"]),
+      name: "DebugTests",
+      dependencies: ["Debug"]),
     .testTarget(
       name: "FuseTests",
-      dependencies: ["Fuse", "DemoServer"]),
+      dependencies: ["Fuse", "Debug"]),
   ]
 )
