@@ -53,7 +53,7 @@ public extension Fusable {
     return lhs.id == rhs.id
   }
   
-  var dictionary: [String: Any]? {
+  func parseDictionary() -> [String: Any]? {
     guard let data = self.toJSONData() else { return nil }
     return (try? JSONSerialization.jsonObject(with: data, options: .allowFragments)).flatMap { $0 as? [String: Any] }
   }

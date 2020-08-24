@@ -116,9 +116,7 @@ public class DebugServer: FuseServer {
     handler.typeId = type.typeId
     handler.arrayCallback = { storables in
       let filtered = storables.filter { storable in
-        guard let json = storable.toJSONData() else { return false }
-        guard let dict = ((try? JSONSerialization.jsonObject(with: json, options: .allowFragments)).flatMap { $0 as? [String: Any] }) else { return false }
-        guard let fieldValue = dict[dataField] else { return false }
+        guard let fieldValue = storable.parseDictionary()?[dataField] else { return false }
         
         return isEqual(a: fieldValue, b: value, as: Int.self) || isEqual(a: fieldValue, b: value, as: Double.self) || isEqual(a: fieldValue, b: value, as: Float.self) || isEqual(a: fieldValue, b: value, as: String.self) || isEqual(a: fieldValue, b: value, as: Bool.self)
       }
@@ -136,9 +134,7 @@ public class DebugServer: FuseServer {
     handler.typeId = type.typeId
     handler.arrayCallback = { storables in
       let filtered = storables.filter { storable in
-        guard let json = storable.toJSONData() else { return false }
-        guard let dict = ((try? JSONSerialization.jsonObject(with: json, options: .allowFragments)).flatMap { $0 as? [String: Any] }) else { return false }
-        guard let fieldValue = dict[dataField] else { return false }
+        guard let fieldValue = storable.parseDictionary()?[dataField] else { return false }
         
         return values.contains { isEqual(a: fieldValue, b: $0, as: Int.self) || isEqual(a: fieldValue, b: $0, as: Double.self) || isEqual(a: fieldValue, b: $0, as: Float.self) || isEqual(a: fieldValue, b: $0, as: String.self) || isEqual(a: fieldValue, b: $0, as: Bool.self) }
       }
@@ -155,9 +151,7 @@ public class DebugServer: FuseServer {
     handler.typeId = type.typeId
     handler.arrayCallback = { storables in
       let filtered = storables.filter { storable in
-        guard let json = storable.toJSONData() else { return false }
-        guard let dict = ((try? JSONSerialization.jsonObject(with: json, options: .allowFragments)).flatMap { $0 as? [String: Any] }) else { return false }
-        guard let fieldValue = dict[dataField] else { return false }
+        guard let fieldValue = storable.parseDictionary()?[dataField] else { return false }
         
         return isEqual(a: fieldValue, b: value, as: Int.self) || isEqual(a: fieldValue, b: value, as: Double.self) || isEqual(a: fieldValue, b: value, as: Float.self) || isEqual(a: fieldValue, b: value, as: String.self) || isEqual(a: fieldValue, b: value, as: Bool.self)
       }
