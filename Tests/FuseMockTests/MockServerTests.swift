@@ -1,6 +1,6 @@
 //
-//  DebugTests.swift
-//  DebugTests
+//  MockServerTests.swift
+//  FuseMockTests
 //
 //  Created by Nicolas Degen on 19.03.20.
 //  Copyright © 2020 Nicolas Degen. All rights reserved.
@@ -8,9 +8,9 @@
 
 import XCTest
 import Fuse
-@testable import Debug
+@testable import FuseMock
 
-final class DebugServerTests: XCTestCase {
+final class MockServerTests: XCTestCase {
   
   var bindings = [BindingHandler]()
   
@@ -18,14 +18,14 @@ final class DebugServerTests: XCTestCase {
   }
   
   func testSetStorable() {
-    let server = DebugServer()
+    let server = MockServer()
     server.set(TestData(id: "a", age: 12))
     XCTAssert(server.typeStore[TestData.typeId] != nil)
     XCTAssert(server.typeStore[TestData.typeId]?.count == 1)
   }
   
   func testSetTypesStorable() {
-    let server = DebugServer()
+    let server = MockServer()
     server.set(TestData(id: "a", age: 12))
     server.set(TestData(id: "b", age: 23))
     server.set(DemoTestData(id: "c", test: "12"))

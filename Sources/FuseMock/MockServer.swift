@@ -1,5 +1,5 @@
 //
-//  DebugServer.swift
+//  MockServer.swift
 //  Fuse
 //
 //  Created by Nicolas Degen on 20.03.20.
@@ -9,10 +9,10 @@
 import Foundation
 import Fuse
 
-public class DebugBindingHandler: BindingHandler {
+public class MockBindingHandler: BindingHandler {
   private let id = UUID().uuidString
   
-  var server: DebugServer
+  var server: MockServer
   
   var typeId: Id = ""
   
@@ -23,7 +23,7 @@ public class DebugBindingHandler: BindingHandler {
     server.bindingHandlers.remove(self)
   }
   
-  fileprivate init(server: DebugServer) {
+  fileprivate init(server: MockServer) {
     self.server = server
   }
   
@@ -45,8 +45,8 @@ public class DebugBindingHandler: BindingHandler {
   }
 }
 
-extension DebugBindingHandler: Hashable {
-  public static func == (lhs: DebugBindingHandler, rhs: DebugBindingHandler) -> Bool {
+extension MockBindingHandler: Hashable {
+  public static func == (lhs: MockBindingHandler, rhs: MockBindingHandler) -> Bool {
     lhs.id == rhs.id
   }
   
@@ -55,12 +55,12 @@ extension DebugBindingHandler: Hashable {
   }
 }
 
-public class DebugServer: FuseServer {
+public class MockServer: FuseServer {
   public init(){}
   
   var typeStore = [Id: [Id: Fusable]]()
   
-  var bindingHandlers = Set<DebugBindingHandler>()
+  var bindingHandlers = Set<MockBindingHandler>()
   
   enum BindingTypes {
     case value, array, filteredArray, typedArray
@@ -101,7 +101,7 @@ public class DebugServer: FuseServer {
   
   public func bind(toId id: Id, ofDataType type: Fusable.Type, completion: @escaping (Fusable?) -> ()) -> BindingHandler {
     completion(typeStore[type.typeId]?[id])
-    let handler = DebugBindingHandler(server: self)
+    let handler = MockBindingHandler(server: self)
     handler.server = self
     handler.typeId = type.typeId
     handler.valueCallback = completion
@@ -111,7 +111,7 @@ public class DebugServer: FuseServer {
   }
   
   public func bind(dataOfType type: Fusable.Type, whereDataField dataField: String, isEqualTo value: Any, orderField: String?, descendingOrder: Bool, completion: @escaping ([Fusable]) -> ()) -> BindingHandler {
-    let handler = DebugBindingHandler(server: self)
+    let handler = MockBindingHandler(server: self)
     handler.server = self
     handler.typeId = type.typeId
     handler.arrayCallback = { storables in
@@ -129,7 +129,7 @@ public class DebugServer: FuseServer {
   
   
   public func bind(dataOfType type: Fusable.Type, whereDataField dataField: String, isContainedIn values: [Any], orderField: String?, descendingOrder: Bool, completion: @escaping ([Fusable]) -> ()) -> BindingHandler {
-    let handler = DebugBindingHandler(server: self)
+    let handler = MockBindingHandler(server: self)
     handler.server = self
     handler.typeId = type.typeId
     handler.arrayCallback = { storables in
@@ -146,7 +146,7 @@ public class DebugServer: FuseServer {
   }
   
   public func bind(dataOfType type: Fusable.Type, whereDataField dataField: String, contains value: Any, completion: @escaping ([Fusable]) -> ()) -> BindingHandler {
-    let handler = DebugBindingHandler(server: self)
+    let handler = MockBindingHandler(server: self)
     handler.server = self
     handler.typeId = type.typeId
     handler.arrayCallback = { storables in
@@ -163,7 +163,7 @@ public class DebugServer: FuseServer {
   }
   
   public func bind(toIds ids: [Id], dataOfType type: Fusable.Type,  completion: @escaping ([Fusable]) -> ()) -> BindingHandler {
-    let handler = DebugBindingHandler(server: self)
+    let handler = MockBindingHandler(server: self)
     handler.server = self
     handler.typeId = type.typeId
     handler.arrayCallback = completion
@@ -173,7 +173,7 @@ public class DebugServer: FuseServer {
   }
   
   public func bind(toDataType type: Fusable.Type, completion: @escaping ([Fusable]) -> ()) -> BindingHandler {
-    let handler = DebugBindingHandler(server: self)
+    let handler = MockBindingHandler(server: self)
     handler.server = self
     handler.typeId = type.typeId
     handler.arrayCallback = completion
