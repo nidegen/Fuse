@@ -48,7 +48,7 @@ final class MockServerTests: XCTestCase {
   func testGetStorable() {
     let a = TestData(id: "a", age: 12)
     let b = TestData(id: "b", age: 122)
-    let server = DebugServer()
+    let server = MockServer()
     server.set(a)
     XCTAssert(server.typeStore[TestData.typeId]?.count == 1)
     
@@ -73,7 +73,7 @@ final class MockServerTests: XCTestCase {
     nonExpectation.isInverted = true
     var inbox = [TestData?]()
     let data = TestData(id: "a", age: 12)
-    let server = DebugServer()
+    let server = MockServer()
     bindings += [server.bind(toId: "a") { (received: TestData?) in
       inbox.append(received)
       if inbox.count == 3 {
@@ -94,7 +94,7 @@ final class MockServerTests: XCTestCase {
     let b = TestData(id: "b", age: 13)
     let c = TestData(id: "c", age: 12)
     let d = TestData(id: "d", age: 14)
-    let server = DebugServer()
+    let server = MockServer()
     server.set([a,b,c,d])
     bindings += [server.bind(whereDataField: "age", isEqualTo: 12) { (data: [TestData]) in
       XCTAssert(data.count == 2)
