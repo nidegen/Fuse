@@ -130,6 +130,21 @@ public extension Server {
     dispatchGroup.wait(timeout: .init(uptimeNanoseconds: 1000 * 1000 * 1000))
     return returnValue
   }
+  
+  func set<T: Fusable>(_ data: T, completion: SetterCompletion = { _ in }) {
+    set(data as Fusable, completion: completion)
+  }
+  
+  func update<T: Fusable>(_ data: T, update: @escaping (T?)->(T)) {
+    get(id: data.id) { (data:T?) in
+      self.set(update(data))
+    }
+  }
+  func update<T: Fusable>(_ id: Id, update: @escaping (T?)->(T)) {
+    get(id: id) { (data:T?) in
+      self.set(update(data))
+    }
+  }
 }
 
 //protocol Server {
