@@ -13,7 +13,7 @@ public protocol BindingHandler: class {
 }
 
 public struct DefaultServerContainer {
-  static var _server: Server?
+  static var _server: FuseServer?
   public static var server: FuseServer {
     get {
       return _server!
@@ -24,8 +24,6 @@ public struct DefaultServerContainer {
     }
   }
 }
-
-public typealias Server = FuseServer
 
 public typealias SetterCompletion = ((Error?)->())?
 
@@ -52,7 +50,7 @@ public protocol FuseServer: class {
   func bind(toDataType type: Fusable.Type, completion: @escaping ([Fusable]) -> ()) -> BindingHandler
 }
 
-public extension Server {
+public extension FuseServer {
   
   func set(_ storables: [Fusable]) {
     storables.forEach { set($0, completion: nil) }

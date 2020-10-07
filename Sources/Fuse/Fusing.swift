@@ -12,11 +12,11 @@ import Combine
 public class Fusing<T:Fusable> {
   var data: T
   var observerHandle: BindingHandler!
-  var server: Server
+  var server: FuseServer
   
   public var didUpdate: ((T)->())?
     
-  public init(wrappedValue value: T, server: Server? = nil, publisher: ObservableObjectPublisher? = nil, updatingServer: Bool = true) {
+  public init(wrappedValue value: T, server: FuseServer? = nil, publisher: ObservableObjectPublisher? = nil, updatingServer: Bool = true) {
     self.data = value
     self.server = server ?? DefaultServerContainer.server
     if updatingServer {

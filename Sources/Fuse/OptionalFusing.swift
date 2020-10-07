@@ -16,12 +16,12 @@ public enum FusingOption {
 public class OptionalFusing<T:Fusable> {
   var data: T?
   var observerHandle: BindingHandler!
-  var server: Server
+  var server: FuseServer
   var id: Id?
   
   public var didUpdate: ((T?)->())?
   
-  public init(id: Id, server: Server? = nil) {
+  public init(id: Id, server: FuseServer? = nil) {
     self.id = id
     self.server = server ?? DefaultServerContainer.server
     self.observerHandle = self.server.bind(toId: id) { [weak self] (update: T?) in
@@ -29,12 +29,12 @@ public class OptionalFusing<T:Fusable> {
     }
   }
   
-  public init(_ data: T, server: Server? = nil, updatingServer: Bool = true) {
+  public init(_ data: T, server: FuseServer? = nil, updatingServer: Bool = true) {
     self.server = server ?? DefaultServerContainer.server
     bindToData(data: data, updatingServer: updatingServer)
   }
   
-  public init(_ option: FusingOption, server: Server? = nil) {
+  public init(_ option: FusingOption, server: FuseServer? = nil) {
     self.server = server ?? DefaultServerContainer.server
   }
   
