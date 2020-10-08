@@ -59,7 +59,7 @@ final class MockServerTests: XCTestCase {
       XCTAssert(received?.id == a.id)
       XCTAssert(received?.age == a.age)
     }
-    server.get(ids: ["a", "b"]) { (data:[TestData]) in
+    server.get(matching: [Constraint(ids: ["a", "b"])]) { (data:[TestData]) in
       XCTAssert(data.contains(a))
       XCTAssert(data.contains(b))
     }
@@ -96,7 +96,8 @@ final class MockServerTests: XCTestCase {
     let d = TestData(id: "d", age: 14)
     let server = MockServer()
     server.set([a,b,c,d])
-    bindings += [server.bind(whereDataField: "age", isEqualTo: 12) { (data: [TestData]) in
+    bindings += [server.bind(matching: [Constraint(whereDataField: "age", .isEqual(value: 12))]) { (data: [TestData]) in
+      print(data.count)
       XCTAssert(data.count == 2)
       expectation.fulfill()
     }]

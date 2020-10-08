@@ -30,14 +30,11 @@ public class MockBindingHandler: BindingHandler {
   var observedIds: [Id]?
   
   func updated(value: Fusable) {
-    
-    if observedIds?.contains(value.id) ?? false {
-        valueCallback(value)
-    } else if typeId == type(of: value).typeId {
-      (server.typeStore[typeId]?.values).map {
-        arrayCallback(Array($0))
-      }
-    }
+    valueCallback(value)
+  }
+  
+  func updated(values: [Fusable]) {
+    arrayCallback(values)
   }
   
   deinit {
@@ -67,11 +64,15 @@ public class MockServer: FuseServer {
   }
     
   public func set(_ storable: Fusable, completion: SetterCompletion = nil) {
-    if typeStore[type(of: storable).typeId] == nil {
-      typeStore[type(of: storable).typeId] = [storable.id: storable]
+    let typeId = type(of: storable).typeId
+    if typeStore[typeId] == nil {
+      let id = storable.id
+      typeStore[typeId] = [id: storable]
     } else {
-      typeStore[type(of: storable).typeId]?[storable.id] = storable
+      typeStore[typeId]?[storable.id] = storable
     }
+    let allUpdatedValues: [Fusable] = typeStore[typeId].map { $0.map { $1 } } ?? []
+    bindingHandlers.forEach { $0.updated(values: allUpdatedValues)}
     bindingHandlers.forEach { $0.updated(value: storable)}
   }
   
@@ -85,18 +86,15 @@ public class MockServer: FuseServer {
     typeStore[type.typeId]?[id] = nil
   }
   
-  public func get(dataOfType type: Fusable.Type, whereDataField dataField: String, isEqualTo value: Any, orderField: String?, descendingOrder: Bool, completion: @escaping ([Fusable]) -> ()) {
-    completion(typeStore[type.typeId]?.compactMap { return $1 } ?? [])
-  }
-  
-  public func get(ids: [Id], ofDataType type: Fusable.Type, completion: @escaping ([Fusable]) -> ()) {
-    completion(typeStore[type.typeId]?.compactMap { return ids.contains($0) ? $1 : nil } ?? [])
-  }
-  
   public func get(id: Id, ofDataType type: Fusable.Type, completion: @escaping (Fusable?) -> ()) {
     let typeId = type.typeId
     let first = (typeStore[typeId]?.compactMap { return id == $0 ? $1 : nil } ?? []).first { $0.id == id }
     completion(first)
+  }
+  
+  public func get(dataOfType type: Fusable.Type, matching constraints: [Constraint], completion: @escaping ([Fusable]) -> ()) {
+    let fusable: [Fusable] = typeStore[type.typeId]?.compactMap { return $1} ?? []
+    completion(fusable.filter { $0.matches(constraints) })
   }
   
   public func bind(toId id: Id, ofDataType type: Fusable.Type, completion: @escaping (Fusable?) -> ()) -> BindingHandler {
@@ -110,80 +108,15 @@ public class MockServer: FuseServer {
     return handler
   }
   
-  public func bind(dataOfType type: Fusable.Type, whereDataField dataField: String, isEqualTo value: Any, orderField: String?, descendingOrder: Bool, completion: @escaping ([Fusable]) -> ()) -> BindingHandler {
+  public func bind(dataOfType type: Fusable.Type, matching constraints: [Constraint], completion: @escaping ([Fusable]) -> ()) -> BindingHandler {
     let handler = MockBindingHandler(server: self)
     handler.server = self
     handler.typeId = type.typeId
     handler.arrayCallback = { storables in
-      let filtered = storables.filter { storable in
-        guard let fieldValue = storable.parseDictionary()?[dataField] else { return false }
-        
-        return isEqual(a: fieldValue, b: value, as: Int.self) || isEqual(a: fieldValue, b: value, as: Double.self) || isEqual(a: fieldValue, b: value, as: Float.self) || isEqual(a: fieldValue, b: value, as: String.self) || isEqual(a: fieldValue, b: value, as: Bool.self)
-      }
-      let sorted = filtered
-      completion(sorted)
+      let values = storables.filter { $0.matches(constraints) }
+      completion(values)
     }
     bindingHandlers.insert(handler)
     return handler
   }
-  
-  
-  public func bind(dataOfType type: Fusable.Type, whereDataField dataField: String, isContainedIn values: [Any], orderField: String?, descendingOrder: Bool, completion: @escaping ([Fusable]) -> ()) -> BindingHandler {
-    let handler = MockBindingHandler(server: self)
-    handler.server = self
-    handler.typeId = type.typeId
-    handler.arrayCallback = { storables in
-      let filtered = storables.filter { storable in
-        guard let fieldValue = storable.parseDictionary()?[dataField] else { return false }
-        
-        return values.contains { isEqual(a: fieldValue, b: $0, as: Int.self) || isEqual(a: fieldValue, b: $0, as: Double.self) || isEqual(a: fieldValue, b: $0, as: Float.self) || isEqual(a: fieldValue, b: $0, as: String.self) || isEqual(a: fieldValue, b: $0, as: Bool.self) }
-      }
-      let sorted = filtered
-      completion(sorted)
-    }
-    bindingHandlers.insert(handler)
-    return handler
-  }
-  
-  public func bind(dataOfType type: Fusable.Type, whereDataField dataField: String, contains value: Any, completion: @escaping ([Fusable]) -> ()) -> BindingHandler {
-    let handler = MockBindingHandler(server: self)
-    handler.server = self
-    handler.typeId = type.typeId
-    handler.arrayCallback = { storables in
-      let filtered = storables.filter { storable in
-        guard let fieldValue = storable.parseDictionary()?[dataField] else { return false }
-        
-        return isEqual(a: fieldValue, b: value, as: Int.self) || isEqual(a: fieldValue, b: value, as: Double.self) || isEqual(a: fieldValue, b: value, as: Float.self) || isEqual(a: fieldValue, b: value, as: String.self) || isEqual(a: fieldValue, b: value, as: Bool.self)
-      }
-      let sorted = filtered
-      completion(sorted)
-    }
-    bindingHandlers.insert(handler)
-    return handler
-  }
-  
-  public func bind(toIds ids: [Id], dataOfType type: Fusable.Type,  completion: @escaping ([Fusable]) -> ()) -> BindingHandler {
-    let handler = MockBindingHandler(server: self)
-    handler.server = self
-    handler.typeId = type.typeId
-    handler.arrayCallback = completion
-    handler.observedIds = ids
-    bindingHandlers.insert(handler)
-    return handler
-  }
-  
-  public func bind(toDataType type: Fusable.Type, completion: @escaping ([Fusable]) -> ()) -> BindingHandler {
-    let handler = MockBindingHandler(server: self)
-    handler.server = self
-    handler.typeId = type.typeId
-    handler.arrayCallback = completion
-    bindingHandlers.insert(handler)
-    return handler
-  }
-}
-
-func isEqual<T: Equatable>(a: Any, b: Any, as type: T.Type) -> Bool {
-  guard let aa = a as? T else { return false }
-  guard let bb = b as? T else { return false }
-  return aa == bb
 }

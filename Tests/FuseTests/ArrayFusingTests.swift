@@ -12,7 +12,7 @@ import XCTest
 
 
 class TestArrayClass {
-  @ArrayFusing(server: testServer, whereDataField: "name", isEqualTo: "Peter")
+  @ArrayFusing(server: testServer, matching: [Constraint(whereDataField: "name", .isEqual(value: "Tom"))])
   var testData: [TestData]
 }
 
@@ -31,7 +31,6 @@ class ArrayFusingTests: XCTestCase {
   func testSetter() {
     let testClass = TestArrayClass()
     testServer.set(TestData(id: "i", name: "Tim"))
-    sleep(2)
-    XCTAssert(testClass.testData.count == 3)
+    XCTAssert(testClass.testData.count == 2)
   }
 }

@@ -32,22 +32,11 @@ public protocol FuseServer: class {
   func set(_ storable: Fusable, completion: SetterCompletion)
   func delete(_ id: Id, forDataType type: Fusable.Type, completion: SetterCompletion)
   
-  func get(dataOfType type: Fusable.Type, whereDataField dataField: String, isEqualTo value: Any, orderField: String?,
-           descendingOrder: Bool, completion: @escaping ([Fusable])->())
-  func get(ids: [Id], ofDataType type: Fusable.Type, completion: @escaping ([Fusable])->())
+  func get(dataOfType type: Fusable.Type, matching constraints: [Constraint], completion: @escaping ([Fusable])->())
   func get(id: Id, ofDataType type: Fusable.Type, completion: @escaping (Fusable?)->())
   
   func bind(toId id: Id, ofDataType type: Fusable.Type, completion: @escaping (Fusable?) -> ()) -> BindingHandler
-  
-  func bind(toIds ids: [Id], dataOfType type: Fusable.Type, completion: @escaping ([Fusable]) -> ()) -> BindingHandler
-  
-  func bind(dataOfType type: Fusable.Type, whereDataField dataField: String, isEqualTo value: Any, orderField: String?, descendingOrder: Bool, completion: @escaping ([Fusable]) -> ()) -> BindingHandler
-  
-  func bind(dataOfType type: Fusable.Type, whereDataField dataField: String, isContainedIn value: [Any], orderField: String?, descendingOrder: Bool, completion: @escaping ([Fusable]) -> ()) -> BindingHandler
-  
-  func bind(dataOfType type: Fusable.Type, whereDataField dataField: String, contains value: Any, completion: @escaping ([Fusable]) -> ()) -> BindingHandler
-  
-  func bind(toDataType type: Fusable.Type, completion: @escaping ([Fusable]) -> ()) -> BindingHandler
+  func bind(dataOfType type: Fusable.Type, matching constraints: [Constraint], completion: @escaping ([Fusable]) -> ()) -> BindingHandler
 }
 
 public extension FuseServer {
@@ -56,31 +45,9 @@ public extension FuseServer {
     storables.forEach { set($0, completion: nil) }
   }
   
-  func bind<T: Fusable>(whereDataField dataField: String, isContainedIn values: [Any], orderField: String? = nil,
-                         descendingOrder: Bool = true, completion: @escaping ([T])->()) -> BindingHandler {
-    self.bind(dataOfType: T.self, whereDataField: dataField, isContainedIn: values, orderField: orderField,
-                descendingOrder: descendingOrder) { data in
+  func bind<T: Fusable>(matching constraints: [Constraint] = [], completion: @escaping ([T])->()) -> BindingHandler {
+    self.bind(dataOfType: T.self, matching: constraints) { data in
                   completion(data as? [T] ?? [])
-    }
-  }
-  
-  func bind<T: Fusable>(whereDataField dataField: String, isEqualTo value: Any, orderField: String? = nil,
-                         descendingOrder: Bool = true, completion: @escaping ([T])->()) -> BindingHandler {
-    self.bind(dataOfType: T.self, whereDataField: dataField, isEqualTo: value, orderField: orderField,
-                descendingOrder: descendingOrder) { data in
-                  completion(data as? [T] ?? [])
-    }
-  }
-  
-  func bind<T: Fusable>(whereDataField dataField: String, contains value: Any, completion: @escaping ([T])->()) -> BindingHandler {
-    self.bind(dataOfType: T.self, whereDataField: dataField, contains: value) { data in
-                  completion(data as? [T] ?? [])
-    }
-  }
-  
-  func bind<T: Fusable>(completion: @escaping ([T])->()) -> BindingHandler {
-    return self.bind(toDataType: T.self) { data in
-      completion(data as? [T] ?? [])
     }
   }
   
@@ -90,21 +57,8 @@ public extension FuseServer {
     }
   }
   
-  func bind<T: Fusable>(toIds ids: [Id], completion: @escaping ([T])->()) -> BindingHandler {
-    return self.bind(toIds: ids, dataOfType : T.self) { data in
-      completion(data as? [T] ?? [])
-    }
-  }
-  
-  func get<T: Fusable>(whereDataField dataField: String, isEqualTo value: Any, orderField: String? = nil,
-                        descendingOrder: Bool = true, completion: @escaping ([T])->()) {
-    get(dataOfType: T.self, whereDataField: dataField, isEqualTo: value, orderField: orderField, descendingOrder: descendingOrder) { data in
-      completion((data as? [T]) ?? [])
-    }
-  }
-  
-  func get<T: Fusable>(ids: [Id], completion: @escaping ([T])->()) {
-    get(ids: ids, ofDataType: T.self) { data in
+  func get<T: Fusable>(matching constraints: [Constraint] = [], completion: @escaping ([T])->()) {
+    get(dataOfType: T.self, matching: constraints) { data in
       completion((data as? [T]) ?? [])
     }
   }
