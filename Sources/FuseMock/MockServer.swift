@@ -53,6 +53,14 @@ extension MockBindingHandler: Hashable {
 }
 
 public class MockServer: FuseServer {
+  public func update(_ storable: Fusable, completion: FuseCompletion) {
+    set(storable, merge: false, completion: completion)
+  }
+  
+  public func update(_ storables: [Fusable], completion: FuseCompletion) {
+    set(storables, merge: false, completion: completion)
+  }
+  
   public init(){}
   
   var typeStore = [Id: [Id: Fusable]]()
@@ -63,7 +71,7 @@ public class MockServer: FuseServer {
     case value, array, filteredArray, typedArray
   }
     
-  public func set(_ storable: Fusable, completion: SetterCompletion = nil) {
+  public func set(_ storable: Fusable, merge: Bool, completion: FuseCompletion = nil) {
     let typeId = type(of: storable).typeId
     if typeStore[typeId] == nil {
       let id = storable.id
@@ -76,13 +84,13 @@ public class MockServer: FuseServer {
     bindingHandlers.forEach { $0.updated(value: storable)}
   }
   
-  public func set(_ storables: [Fusable], completion: SetterCompletion = nil) {
+  public func set(_ storables: [Fusable], merge: Bool, completion: FuseCompletion = nil) {
     storables.forEach {
-      self.set($0, completion: completion)
+      self.set($0, merge: merge, completion: completion)
     }
   }
   
-  public func delete(_ id: Id, forDataType type: Fusable.Type, completion: SetterCompletion = nil) {
+  public func delete(_ id: Id, forDataType type: Fusable.Type, completion: FuseCompletion = nil) {
     typeStore[type.typeId]?[id] = nil
   }
   
