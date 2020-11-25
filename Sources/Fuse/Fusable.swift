@@ -1,11 +1,3 @@
-//
-//  Fusable.swift
-//  Fuse
-//
-//  Created by Nicolas Degen on 19.03.20.
-//  Copyright © 2020 Nicolas Degen. All rights reserved.
-//
-
 import Foundation
 
 public typealias Id = String
@@ -56,10 +48,6 @@ public extension Fusable {
   func parseDictionary() -> [String: Any]? {
     guard let data = self.toJSONData() else { return nil }
     return (try? JSONSerialization.jsonObject(with: data, options: .allowFragments)).flatMap { $0 as? [String: Any] }
-  }
-  
-  func upload(toServer server: FuseServer = DefaultServerContainer.server) {
-    server.set(self)
   }
 }
 

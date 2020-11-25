@@ -1,11 +1,3 @@
-//
-//  ArrayFusing.swift
-//  Fuse
-//
-//  Created by Nicolas Degen on 29.03.20.
-//  Copyright © 2020 Nicolas Degen. All rights reserved.
-//
-
 import Combine
 
 @propertyWrapper
@@ -55,7 +47,7 @@ public class ArrayFusing<T:Fusable> {
     set {
       objectWillChange?.send()
       data = newValue
-      server.set(data)
+      server.update(data)
     }
   }
 

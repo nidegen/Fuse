@@ -1,11 +1,3 @@
-//
-//  Fusing.swift
-//  Fuse
-//
-//  Created by Nicolas Degen on 10.05.20.
-//  Copyright © 2020 Nicolas Degen. All rights reserved.
-//
-
 import Combine
 
 public enum FusingOption {
@@ -63,17 +55,24 @@ public class OptionalFusing<T:Fusable> {
     }
     
     set {
-      objectWillChange?.send()
-      publisher?.subject.value = newValue
-      self.didUpdate?(newValue)
+      let old = data
+      data = newValue
       
-      if let data = newValue {
-        if id == nil || id == data.id {
+      if let newData = newValue {
+        if id == nil || id == newData.id {
           if observerHandle == nil {
-            bindToData(data: data)
+            bindToData(data: newData)
           } else {
-            self.server.set(data, completion: nil)
-            self.data = data
+            server.update(newData) { (error: Error?) in
+              if error != nil {
+                self.objectWillChange?.send()
+                self.publisher?.subject.value = newValue
+                self.didUpdate?(newValue)
+              } else {
+                self.data = old
+              }
+            }
+            self.data = newData
           }
         } else {
           print("Error: Data with non-matching Id assigned to Optional Fusing. Ignoring")
@@ -84,7 +83,10 @@ public class OptionalFusing<T:Fusable> {
         observerHandle = nil
         if let id = self.id {
           server.delete(id, forDataType: T.self) { error in
-            error.map { print($0.localizedDescription) }
+            if let error = error {
+              self.data = old
+              print(error.localizedDescription)
+            }
           }
         }
         self.id = nil

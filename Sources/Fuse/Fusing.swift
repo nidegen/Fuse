@@ -1,11 +1,3 @@
-//
-//  Fusing.swift
-//  Fuse
-//
-//  Created by Nicolas Degen on 20.03.20.
-//  Copyright © 2020 Nicolas Degen. All rights reserved.
-//
-
 import Combine
 
 @propertyWrapper
@@ -45,9 +37,15 @@ public class Fusing<T:Fusable> {
     
     set {
       objectWillChange?.send()
+      let old = data
       data = newValue
-      server.set(data, completion: nil)
-      didUpdate?(data)
+      server.update(data) { (error: Error?) in
+        if error != nil {
+          self.didUpdate?(newValue)
+        } else {
+          self.data = old
+        }
+      }
       publisher?.subject.value = newValue
     }
   }

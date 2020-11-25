@@ -1,11 +1,3 @@
-//
-//  Fuser.swift
-//  Fuse
-//
-//  Created by Nicolas Degen on 01.07.20.
-//  Copyright © 2020 Nicolas Degen. All rights reserved.
-//
-
 import Foundation
 
 @propertyWrapper
