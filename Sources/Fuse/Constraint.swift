@@ -3,6 +3,8 @@ import Foundation
 public enum Relation {
   case isContaining(value: Any)
   case isEqual(value: Any)
+  case notEqual(value: Any)
+  case isNotContaining(value: Any)
   case isContainedIn(value: [Any])
   case isExisting
   case isNotExisting
