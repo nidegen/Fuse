@@ -8,9 +8,9 @@ public class ArrayFusing<T:Fusable> {
   
   public var didUpdate: (([T])->())?
   
-  public init(server: FuseServer? = nil, ids: [Id], publisher: ObservableObjectPublisher? = nil) {
+  public init(server: FuseServer, ids: [Id], publisher: ObservableObjectPublisher? = nil) {
     self.data = [T]()
-    self.server = server ?? DefaultServerContainer.server
+    self.server = server
     if !ids.isEmpty {
       observerHandle = self.server.bind(matching: [Constraint(ids: ids)]) { [weak self] (update: [T]) in
         self?.callback(update: update)
@@ -19,17 +19,17 @@ public class ArrayFusing<T:Fusable> {
     objectWillChange = publisher
   }
 
-  public init(server: FuseServer? = nil, matching constraints: [Constraint] = [], publisher: ObservableObjectPublisher? = nil) {
+  public init(server: FuseServer, matching constraints: [Constraint] = [], publisher: ObservableObjectPublisher? = nil) {
     self.data = [T]()
-    self.server = server ?? DefaultServerContainer.server
+    self.server = server
     observerHandle = self.server.bind(matching: constraints) { [weak self] (update: [T]) in
       self?.callback(update: update)
     }
     objectWillChange = publisher
   }
 
-  public init(_ option: FusingOption, server: FuseServer? = nil) {
-    self.server = server ?? DefaultServerContainer.server
+  public init(_ option: FusingOption, server: FuseServer) {
+    self.server = server
     self.data = []
   }
   

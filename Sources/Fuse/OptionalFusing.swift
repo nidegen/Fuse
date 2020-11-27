@@ -13,21 +13,21 @@ public class OptionalFusing<T:Fusable> {
   
   public var didUpdate: ((T?)->())?
   
-  public init(id: Id, server: FuseServer? = nil) {
+  public init(id: Id, server: FuseServer) {
     self.id = id
-    self.server = server ?? DefaultServerContainer.server
+    self.server = server
     self.observerHandle = self.server.bind(toId: id) { [weak self] (update: T?) in
       self?.callback(update: update)
     }
   }
   
-  public init(_ data: T, server: FuseServer? = nil, updatingServer: Bool = true) {
-    self.server = server ?? DefaultServerContainer.server
+  public init(_ data: T, server: FuseServer, updatingServer: Bool = true) {
+    self.server = server
     bindToData(data: data, updatingServer: updatingServer)
   }
   
-  public init(_ option: FusingOption, server: FuseServer? = nil) {
-    self.server = server ?? DefaultServerContainer.server
+  public init(_ option: FusingOption, server: FuseServer) {
+    self.server = server
   }
   
   func callback(update: T?) {

@@ -4,19 +4,6 @@ public protocol BindingHandler: class {
   func remove()
 }
 
-public struct DefaultServerContainer {
-  static var _server: FuseServer?
-  public static var server: FuseServer {
-    get {
-      return _server!
-    }
-    
-    set {
-      _server = newValue
-    }
-  }
-}
-
 public typealias FuseCompletion = ((Error?)->())?
 @available(*, deprecated, renamed: "FuseCompletion")
 public typealias SetterCompletion = ((Error?)->())?
@@ -76,6 +63,11 @@ public extension FuseServer {
       completion((data as? T?) ?? nil)
     }
   }
+  
+  func delete(_ id: Id, forDataType type: Fusable.Type) {
+    delete(id, forDataType: type, completion: nil)
+  }
+
   
   @available(*, deprecated, renamed: "FuseCompletion")
   func get<T: Fusable>(id: Id) -> T? {

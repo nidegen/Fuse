@@ -8,9 +8,9 @@ public class Fusing<T:Fusable> {
   
   public var didUpdate: ((T)->())?
     
-  public init(wrappedValue value: T, server: FuseServer? = nil, publisher: ObservableObjectPublisher? = nil, updatingServer: Bool = true) {
+  public init(wrappedValue value: T, server: FuseServer, publisher: ObservableObjectPublisher? = nil, updatingServer: Bool = true) {
     self.data = value
-    self.server = server ?? DefaultServerContainer.server
+    self.server = server
     if updatingServer {
       self.server.set(value, completion: nil)
     }

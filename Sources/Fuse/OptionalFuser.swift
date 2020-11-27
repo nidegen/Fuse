@@ -4,8 +4,8 @@ import Foundation
 public class OptionalFuser<T:Fusable>: ObservableObject {
   var data: OptionalFusing<T>
     
-  public init(id: Id, server: FuseServer? = nil) {
-    let server = server ?? DefaultServerContainer.server
+  public init(id: Id, server: FuseServer) {
+    let server = server
     data = OptionalFusing(id: id, server: server)
     data.objectWillChange = self.objectWillChange
   }
