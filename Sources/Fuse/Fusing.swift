@@ -8,10 +8,12 @@ public class Fusing<T:Fusable> {
   
   public var didUpdate: ((T)->())?
     
-  public init(wrappedValue value: T, server: FuseServer, publisher: ObservableObjectPublisher? = nil, updatingServer: Bool = true) {
+  public init(wrappedValue value: T, server: FuseServer,
+              publisher: ObservableObjectPublisher? = nil,
+              settingNew: Bool = false) {
     self.data = value
     self.server = server
-    if updatingServer {
+    if settingNew {
       self.server.set(value, completion: nil)
     }
     self.observerHandle = self.server.bind(toId: value.id) { [weak self] (update: T?) in

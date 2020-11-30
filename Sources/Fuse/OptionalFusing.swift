@@ -10,24 +10,29 @@ public class OptionalFusing<T:Fusable> {
   var observerHandle: BindingHandler!
   var server: FuseServer
   var id: Id?
+  var settingNew: Bool
   
   public var didUpdate: ((T?)->())?
   
-  public init(id: Id, server: FuseServer) {
+  public init(id: Id, server: FuseServer, settingNew: Bool = false) {
     self.id = id
     self.server = server
+    self.settingNew = settingNew
     self.observerHandle = self.server.bind(toId: id) { [weak self] (update: T?) in
       self?.callback(update: update)
     }
   }
   
-  public init(_ data: T, server: FuseServer, updatingServer: Bool = true) {
+  public init(_ data: T, server: FuseServer, settingNew: Bool = false) {
     self.server = server
-    bindToData(data: data, updatingServer: updatingServer)
+    self.settingNew = settingNew
+    bindToData(data: data)
   }
   
   public init(_ option: FusingOption, server: FuseServer) {
     self.server = server
+    self.settingNew = false
+
   }
   
   func callback(update: T?) {
@@ -37,11 +42,11 @@ public class OptionalFusing<T:Fusable> {
     self.didUpdate?(update)
   }
   
-  func bindToData(data: T, updatingServer: Bool = true) {
+  func bindToData(data: T) {
     self.id = data.id
     self.data = data
     self.didUpdate?(data)
-    if updatingServer {
+    if settingNew {
       self.server.set(data, completion: nil)
     }
     self.observerHandle = self.server.bind(toId: data.id) { [weak self] (update: T?) in

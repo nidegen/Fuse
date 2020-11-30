@@ -4,9 +4,9 @@ import Foundation
 public class Fuser<T:Fusable>: ObservableObject {
   var data: Fusing<T>
     
-  public init(wrappedValue: T, server: FuseServer,  updatingServer: Bool = true) {
+  public init(wrappedValue: T, server: FuseServer,  settingNew: Bool = false) {
     let server = server
-    data = Fusing(wrappedValue: wrappedValue, server: server, updatingServer: updatingServer)
+    data = Fusing(wrappedValue: wrappedValue, server: server, settingNew: settingNew)
     data.objectWillChange = self.objectWillChange
   }
   
