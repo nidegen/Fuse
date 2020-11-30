@@ -12,7 +12,7 @@ import XCTest
 
 
 class TestClass {
-  @Fusing(server: testServer)
+  @Fusing(server: testServer, settingNew: true)
   var testData = TestData(id: "1", name: "1")
   
   @OptionalFuser(id: "1", server: testServer)
