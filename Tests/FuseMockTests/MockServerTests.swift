@@ -37,7 +37,7 @@ final class MockServerTests: XCTestCase {
     
     server.get(id: "c", ofDataType: DemoTestData.self) { data in
       guard let data = data as? DemoTestData else { XCTFail(); return }
-      XCTAssert(type(of: data).typeId == "demo_test")
+      XCTAssert(type(of: data).typeId == "demo_tests")
       XCTAssert(data.test == "12")
     }
     

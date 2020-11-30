@@ -6,7 +6,6 @@ typealias Storable = Fusable
 
 public protocol Fusable: Codable {
   static var typeId: Id { get }
-  static var serverVersionString: String { get }
   var id: Id { get }
 }
 
@@ -24,11 +23,8 @@ var decoder: JSONDecoder = {
 
 // Note: to access the variable's actual type, use type(of: storable).typeId
 public extension Fusable {
-  
-  static var serverVersionString: String { "undefined" }
-  
   static var typeId: String {
-    return "\(self)".deletingSuffix("Data").camelCaseToSnakeCase()
+    return "\(self)".deletingSuffix("Data").camelCaseToSnakeCase().appending("s")
   }
   
   static func decode(fromData data: Data) throws -> Fusable {

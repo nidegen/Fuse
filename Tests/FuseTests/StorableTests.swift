@@ -28,7 +28,7 @@ class StorableTests: XCTestCase {
     XCTAssert(type(of:testData).typeId == "test_typename")
     XCTAssert(TestData.typeId == "test_typename")
     
-    XCTAssert(type(of:testTestData).typeId == "test_test")
-    XCTAssert(TestTestData.typeId == "test_test")
+    XCTAssert(type(of:testTestData).typeId == "test_tests")
+    XCTAssert(TestTestData.typeId == "test_tests")
   }
 }
