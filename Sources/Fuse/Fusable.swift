@@ -24,11 +24,11 @@ var decoder: JSONDecoder = {
 // Note: to access the variable's actual type, use type(of: storable).typeId
 public extension Fusable {
   static var typeId: String {
-    return "\(self)".deletingSuffix("Data").camelCaseToSnakeCase().appending("s")
+    "\(self)".deletingSuffix("Data").camelCaseToSnakeCase().appending("s")
   }
   
   static func decode(fromData data: Data) throws -> Fusable {
-    return try decoder.decode(self, from: data)
+    try decoder.decode(self, from: data)
   }
   
   func toJSONData() -> Data? { try? encoder.encode(self) }
@@ -38,7 +38,7 @@ public extension Fusable {
   }
   
   static func ==(lhs: Fusable, rhs: Fusable) -> Bool {
-    return lhs.id == rhs.id
+    lhs.id == rhs.id
   }
   
   func parseDictionary() -> [String: Any]? {
