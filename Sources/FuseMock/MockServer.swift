@@ -61,6 +61,10 @@ public class MockServer: FuseServer {
     set(storables, merge: false, completion: completion)
   }
   
+  public func update(_ storable: Fusable, on fields: [String], completion: FuseCompletion) {
+    update(storable, completion: completion)
+  }
+  
   public init(){}
   
   var typeStore = [Id: [Id: Fusable]]()

@@ -12,6 +12,7 @@ public protocol FuseServer: class {
   func set(_ storables: [Fusable], merge: Bool, completion: FuseCompletion)
   func set(_ storable: Fusable, merge: Bool, completion: FuseCompletion)
   func update(_ storables: [Fusable], completion: FuseCompletion)
+  func update(_ storable: Fusable, on fields: [String], completion: FuseCompletion)
   func update(_ storable: Fusable, completion: FuseCompletion)
   func delete(_ id: Id, forDataType type: Fusable.Type, completion: FuseCompletion)
   
@@ -39,6 +40,11 @@ public extension FuseServer {
   func update<T: Fusable>(_ data: [T], completion: FuseCompletion = nil) {
     self.update(data as [Fusable], completion: completion)
   }
+  
+  func update<T: Fusable>(_ data: T, on fields: [String], completion: FuseCompletion) {
+    self.update(data as Fusable, on: fields, completion: completion)
+  }
+
   
   func bind<T: Fusable>(matching constraints: [Constraint] = [], completion: @escaping ([T])->()) -> BindingHandler {
     self.bind(dataOfType: T.self, matching: constraints) { data in
