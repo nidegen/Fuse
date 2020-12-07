@@ -11,6 +11,9 @@ public enum Relation {
   case isGreaterThan(value: Any)
   case isLessThan(value: Any)
   case ordered(ascending: Bool)
+  case limit(number: Int)
+  case endAt(value: Any)
+  case startAt(value: Any)
 }
 
 public struct Constraint {

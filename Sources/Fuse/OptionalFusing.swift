@@ -69,7 +69,7 @@ public class OptionalFusing<T:Fusable> {
             bindToData(data: newData)
           } else {
             server.update(newData) { (error: Error?) in
-              if error != nil {
+              if error == nil {
                 self.objectWillChange?.send()
                 self.publisher?.subject.value = newValue
                 self.didUpdate?(newValue)

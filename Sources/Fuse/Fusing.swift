@@ -42,7 +42,7 @@ public class Fusing<T:Fusable> {
       let old = data
       data = newValue
       server.update(data) { (error: Error?) in
-        if error != nil {
+        if error == nil {
           self.didUpdate?(newValue)
         } else {
           self.data = old
