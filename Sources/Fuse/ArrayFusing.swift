@@ -35,6 +35,7 @@ public class ArrayFusing<T:Fusable> {
   
   func callback(update: [T]) {
     self.objectWillChange?.send()
+    publisher?.subject.value = update
     self.data = update
     didUpdate?(update)
   }
@@ -46,10 +47,43 @@ public class ArrayFusing<T:Fusable> {
     
     set {
       objectWillChange?.send()
+      publisher?.subject.value = newValue
       data = newValue
       server.update(data)
     }
   }
 
   public var objectWillChange: ObservableObjectPublisher?
+  
+  private var publisher: Publisher?
+    
+  public var projectedValue: Publisher {
+    get {
+      if let publisher = publisher {
+        return publisher
+      }
+      let publisher = Publisher(wrappedValue)
+      self.publisher = publisher
+      return publisher
+    }
+  }
+  
+  
+  public struct Publisher: Combine.Publisher {
+    
+    public typealias Output = [T]
+    
+    public typealias Failure = Never
+    
+    public func receive<Downstream: Subscriber>(subscriber: Downstream)
+    where Downstream.Input == [T], Downstream.Failure == Never {
+      subject.subscribe(subscriber)
+    }
+    
+    fileprivate let subject: Combine.CurrentValueSubject<[T], Never>
+    
+    fileprivate init(_ output: Output) {
+      subject = .init(output)
+    }
+  }
 }
