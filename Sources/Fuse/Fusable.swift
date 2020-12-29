@@ -45,6 +45,13 @@ public extension Fusable {
     guard let data = self.toJSONData() else { return nil }
     return (try? JSONSerialization.jsonObject(with: data, options: .allowFragments)).flatMap { $0 as? [String: Any] }
   }
+  
+  var dictionaryDroppingId: [String: Any]? {
+    guard let data = self.toJSONData() else { return nil }
+    var dict = (try? JSONSerialization.jsonObject(with: data, options: .allowFragments)).flatMap { $0 as? [String: Any] }
+    dict?["id"] = nil
+    return dict
+  }
 }
 
 extension String {
