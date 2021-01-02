@@ -17,7 +17,7 @@ final class FuseTests: XCTestCase {
   func testSetter() {
     let input = TestData(id: "input", name: "one")
     testServer.set(input)
-    let output: TestData? = testServer.get(id: "input")
+    let output: TestData? = testServer.getSync(id: "input")
     XCTAssert(output?.name == input.name)
   }
 }

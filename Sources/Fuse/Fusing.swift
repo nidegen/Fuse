@@ -16,8 +16,13 @@ public class Fusing<T:Fusable> {
     if settingNew {
       self.server.set(value, completion: nil)
     }
-    self.observerHandle = self.server.bind(toId: value.id) { [weak self] (update: T?) in
-      self?.callback(update: update)
+    self.observerHandle = self.server.bind(toId: value.id) { [weak self] (result: ValueResult<T>) in
+        switch result {
+        case .success(let update):
+          self?.callback(update: update)
+        case .failure(let error):
+          print(error.localizedDescription)
+        }
     }
       
     self.objectWillChange = publisher

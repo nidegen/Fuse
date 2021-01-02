@@ -18,8 +18,14 @@ public class OptionalFusing<T:Fusable> {
     self.id = id
     self.server = server
     self.settingNew = settingNew
-    self.observerHandle = self.server.bind(toId: id) { [weak self] (update: T?) in
-      self?.callback(update: update)
+    
+    self.observerHandle = self.server.bind(toId: id) { [weak self] (result: ValueResult<T>) in
+        switch result {
+        case .success(let update):
+          self?.callback(update: update)
+        case .failure(let error):
+          print(error.localizedDescription)
+        }
     }
   }
   
@@ -49,8 +55,14 @@ public class OptionalFusing<T:Fusable> {
     if settingNew {
       self.server.set(data, completion: nil)
     }
-    self.observerHandle = self.server.bind(toId: data.id) { [weak self] (update: T?) in
-      self?.callback(update: update)
+    
+    self.observerHandle = self.server.bind(toId: data.id) { [weak self] (result: ValueResult<T>) in
+        switch result {
+        case .success(let update):
+          self?.callback(update: update)
+        case .failure(let error):
+          print(error.localizedDescription)
+        }
     }
   }
   

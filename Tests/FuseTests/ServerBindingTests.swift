@@ -30,9 +30,14 @@ class FusingTests: XCTestCase {
     testServer.set(TestData(id: testClass.testData.id, name: "one"))
     XCTAssert(testClass.testData.name == "one")
     testClass.testData.name = "ha"
-    testServer.get(id: "1", ofDataType: TestData.self) { (data: Storable?) in
-      let test = data as? TestData
-      XCTAssert(test?.name == "ha")
+    testServer.get(id: "1", ofDataType: TestData.self) { result in
+      switch result {
+      case .success(let data):
+        let test = data as? TestData
+        XCTAssert(test?.name == "ha")
+      case .failure(let error):
+        print(error.localizedDescription)
+      }
     }
   }
 }

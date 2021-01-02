@@ -16,9 +16,9 @@ public class MockBindingHandler: BindingHandler {
   
   var typeId: Id = ""
   
-  var valueCallback: (Fusable?) -> () = { data in }
+  var valueCallback: GetValueCompletion = { result in }
   var arrayCallback: ([Fusable]) -> () = { data in }
-  
+
   public func remove() {
     server.bindingHandlers.remove(self)
   }
@@ -30,7 +30,7 @@ public class MockBindingHandler: BindingHandler {
   var observedIds: [Id]?
   
   func updated(value: Fusable) {
-    valueCallback(value)
+    valueCallback(.success(value))
   }
   
   func updated(values: [Fusable]) {
@@ -53,15 +53,15 @@ extension MockBindingHandler: Hashable {
 }
 
 public class MockServer: FuseServer {
-  public func update(_ storable: Fusable, completion: FuseCompletion) {
+  public func update(_ storable: Fusable, completion: SetCompletion) {
     set(storable, merge: false, completion: completion)
   }
   
-  public func update(_ storables: [Fusable], completion: FuseCompletion) {
+  public func update(_ storables: [Fusable], completion: SetCompletion) {
     set(storables, merge: false, completion: completion)
   }
   
-  public func update(_ storable: Fusable, on fields: [String], completion: FuseCompletion) {
+  public func update(_ storable: Fusable, on fields: [String], completion: SetCompletion) {
     update(storable, completion: completion)
   }
   
@@ -75,7 +75,7 @@ public class MockServer: FuseServer {
     case value, array, filteredArray, typedArray
   }
     
-  public func set(_ storable: Fusable, merge: Bool, completion: FuseCompletion = nil) {
+  public func set(_ storable: Fusable, merge: Bool, completion: SetCompletion = nil) {
     let typeId = type(of: storable).typeId
     if typeStore[typeId] == nil {
       let id = storable.id
@@ -88,29 +88,29 @@ public class MockServer: FuseServer {
     bindingHandlers.forEach { $0.updated(value: storable)}
   }
   
-  public func set(_ storables: [Fusable], merge: Bool, completion: FuseCompletion = nil) {
+  public func set(_ storables: [Fusable], merge: Bool, completion: SetCompletion = nil) {
     storables.forEach {
       self.set($0, merge: merge, completion: completion)
     }
   }
   
-  public func delete(_ id: Id, forDataType type: Fusable.Type, completion: FuseCompletion = nil) {
+  public func delete(_ id: Id, forDataType type: Fusable.Type, completion: SetCompletion = nil) {
     typeStore[type.typeId]?[id] = nil
   }
   
-  public func get(id: Id, ofDataType type: Fusable.Type, completion: @escaping (Fusable?) -> ()) {
+  public func get(id: Id, ofDataType type: Fusable.Type, source: DataSource = .serverOrCache, completion: @escaping GetValueCompletion) {
     let typeId = type.typeId
     let first = (typeStore[typeId]?.compactMap { return id == $0 ? $1 : nil } ?? []).first { $0.id == id }
-    completion(first)
+    completion(.success(first))
   }
   
-  public func get(dataOfType type: Fusable.Type, matching constraints: [Constraint], completion: @escaping ([Fusable]) -> ()) {
+  public func get(dataType type: Fusable.Type, matching constraints: [Constraint], source: DataSource = .serverOrCache, completion: @escaping GetArrayCompletion) {
     let fusable: [Fusable] = typeStore[type.typeId]?.compactMap { return $1} ?? []
-    completion(fusable.filter { $0.matches(constraints) })
+    completion(.success(fusable.filter { $0.matches(constraints) }))
   }
   
-  public func bind(toId id: Id, ofDataType type: Fusable.Type, completion: @escaping (Fusable?) -> ()) -> BindingHandler {
-    completion(typeStore[type.typeId]?[id])
+  public func bind(toId id: Id, ofDataType type: Fusable.Type, completion: @escaping GetValueCompletion) -> BindingHandler {
+    completion(.success(typeStore[type.typeId]?[id]))
     let handler = MockBindingHandler(server: self)
     handler.server = self
     handler.typeId = type.typeId
@@ -120,13 +120,13 @@ public class MockServer: FuseServer {
     return handler
   }
   
-  public func bind(dataOfType type: Fusable.Type, matching constraints: [Constraint], completion: @escaping ([Fusable]) -> ()) -> BindingHandler {
+  public func bind(dataType type: Fusable.Type, matching constraints: [Constraint], completion: @escaping GetArrayCompletion) -> BindingHandler {
     let handler = MockBindingHandler(server: self)
     handler.server = self
     handler.typeId = type.typeId
     handler.arrayCallback = { storables in
       let values = storables.filter { $0.matches(constraints) }
-      completion(values)
+      completion(.success(values))
     }
     bindingHandlers.insert(handler)
     return handler

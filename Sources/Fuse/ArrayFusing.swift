@@ -12,8 +12,13 @@ public class ArrayFusing<T:Fusable> {
     self.data = [T]()
     self.server = server
     if !ids.isEmpty {
-      observerHandle = self.server.bind(matching: [Constraint(ids: ids)]) { [weak self] (update: [T]) in
-        self?.callback(update: update)
+      observerHandle = self.server.bind(matching: [Constraint(ids: ids)]) { [weak self] (result: ArrayResult<T>) in
+        switch result {
+        case .success(let update):
+          self?.callback(update: update)
+        case .failure(let error):
+          print(error.localizedDescription)
+        }
       }
     }
     objectWillChange = publisher
@@ -22,8 +27,13 @@ public class ArrayFusing<T:Fusable> {
   public init(server: FuseServer, matching constraints: [Constraint] = [], publisher: ObservableObjectPublisher? = nil) {
     self.data = [T]()
     self.server = server
-    observerHandle = self.server.bind(matching: constraints) { [weak self] (update: [T]) in
-      self?.callback(update: update)
+    observerHandle = self.server.bind(matching: constraints) { [weak self] (result: ArrayResult<T>) in
+      switch result {
+      case .success(let update):
+        self?.callback(update: update)
+      case .failure(let error):
+        print(error.localizedDescription)
+      }
     }
     objectWillChange = publisher
   }
