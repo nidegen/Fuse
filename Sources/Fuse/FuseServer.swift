@@ -112,9 +112,15 @@ public extension FuseServer {
     let dispatchGroup  = DispatchGroup()
 
     dispatchGroup.enter()
-    get(id: id, ofDataType: T.self, source: source) { data in
+    get(id: id, ofDataType: T.self, source: source) { result in
       dispatchGroup.leave()
-      returnValue = data as? T ?? nil
+      switch result {
+      case .success(let data):
+        returnValue = data as? T ?? nil
+      case .failure(let error):
+        print(error.localizedDescription)
+        returnValue = nil
+      }
     }
 
     let _ = dispatchGroup.wait(timeout: .init(uptimeNanoseconds: 1000 * 1000 * 1000))

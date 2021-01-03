@@ -13,7 +13,7 @@ import FuseMock
 var testServer = MockServer()
 
 final class FuseTests: XCTestCase {
-  
+  var server = testServer
   func testSetter() {
     let input = TestData(id: "input", name: "one")
     testServer.set(input)
