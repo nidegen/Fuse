@@ -9,15 +9,35 @@ public protocol Fusable: Codable {
   var id: Id { get }
 }
 
+extension DateFormatter {
+  static var iso8601Miliseconds: DateFormatter {
+    let isoMilisecondDateFormatter = DateFormatter()
+    isoMilisecondDateFormatter.dateFormat = "yyyy-MM-dd'T'HH:mm:ss.SSSZZZZZ"
+    return isoMilisecondDateFormatter
+  }
+}
+
+extension JSONDecoder.DateDecodingStrategy {
+  static var iso8601Miliseconds: JSONDecoder.DateDecodingStrategy {
+    return .formatted(.iso8601Miliseconds)
+  }
+}
+
+extension JSONEncoder.DateEncodingStrategy {
+  static var iso8601Miliseconds: JSONEncoder.DateEncodingStrategy {
+    return .formatted(.iso8601Miliseconds)
+  }
+}
+
 var encoder: JSONEncoder = {
   let encoder = JSONEncoder()
-  encoder.dateEncodingStrategy = .iso8601
+  encoder.dateEncodingStrategy = .iso8601Miliseconds
   return encoder
 }()
 
 var decoder: JSONDecoder = {
   let decoder = JSONDecoder()
-  decoder.dateDecodingStrategy = .iso8601
+  decoder.dateDecodingStrategy = .iso8601Miliseconds
   return decoder
 }()
 
