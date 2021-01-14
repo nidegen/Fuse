@@ -8,6 +8,8 @@ public class ArrayFusing<T:Fusable> {
   
   public var didUpdate: (([T])->())?
   
+  public var updateFilter: (([T])->([T])) = { return $0 }
+  
   public init(server: FuseServer, ids: [Id], publisher: ObservableObjectPublisher? = nil) {
     self.data = [T]()
     self.server = server
@@ -46,7 +48,7 @@ public class ArrayFusing<T:Fusable> {
   func callback(update: [T]) {
     self.objectWillChange?.send()
     publisher?.subject.value = update
-    self.data = update
+    self.data = updateFilter(update)
     didUpdate?(update)
   }
   
@@ -58,7 +60,7 @@ public class ArrayFusing<T:Fusable> {
     set {
       objectWillChange?.send()
       publisher?.subject.value = newValue
-      data = newValue
+      self.data = updateFilter(newValue)
       server.update(data)
     }
   }
