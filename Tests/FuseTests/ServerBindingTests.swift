@@ -11,14 +11,14 @@ import XCTest
 @testable import Fuse
 
 
-class TestClass {
-  @Fusing(server: testServer, settingNew: true)
+class TestClass: ObservableObject {
+  @Fused(server: testServer, settingNew: true)
   var testData = TestData(id: "1", name: "1")
   
   @OptionalFuser(id: "1", server: testServer)
   var fuserTestData: TestData?
   
-  @OptionalFusing(id: "sdf", server: testServer)
+  @FusedOptional(id: "sdf", server: testServer)
   var data: TestData?
 }
 

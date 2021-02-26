@@ -2,11 +2,11 @@ import Foundation
 
 @propertyWrapper
 public class OptionalFuser<T:Fusable>: ObservableObject {
-  var data: OptionalFusing<T>
+  var data: FusedOptional<T>
     
   public init(id: Id, server: FuseServer) {
     let server = server
-    data = OptionalFusing(id: id, server: server)
+    data = FusedOptional(id: id, server: server)
     data.objectWillChange = self.objectWillChange
   }
   

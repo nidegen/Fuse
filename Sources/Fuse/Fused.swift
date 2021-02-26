@@ -1,7 +1,10 @@
 import Combine
 
+@available(*, deprecated, renamed: "Fused")
+typealias Fusing = Fused
+
 @propertyWrapper
-public class Fusing<T:Fusable> {
+public class Fused<T:Fusable> {
   var data: T
   var observerHandle: BindingHandler!
   var server: FuseServer
@@ -16,16 +19,28 @@ public class Fusing<T:Fusable> {
     if settingNew {
       self.server.set(value, completion: nil)
     }
-    self.observerHandle = self.server.bind(toId: value.id) { [weak self] (result: ValueResult<T>) in
-        switch result {
-        case .success(let update):
-          self?.callback(update: update)
-        case .failure(let error):
-          print(error.localizedDescription)
-        }
-    }
+    self.observerHandle = listen()
       
     self.objectWillChange = publisher
+  }
+  
+  func listen() -> BindingHandler {
+    return self.server.bind(toId: data.id) { [weak self] (result: ValueResult<T>) in
+      switch result {
+      case .success(let update):
+        self?.callback(update: update)
+      case .failure(let error):
+        print(error.localizedDescription)
+      }
+    }
+  }
+  
+  func pause() {
+    self.observerHandle.remove()
+  }
+  
+  func start() {
+    self.observerHandle = listen()
   }
   
   func callback(update: T?) {
@@ -56,6 +71,8 @@ public class Fusing<T:Fusable> {
       publisher?.subject.value = newValue
     }
   }
+  
+  // Custom Publisher
   
   public struct Publisher: Combine.Publisher {
     
@@ -89,25 +106,27 @@ public class Fusing<T:Fusable> {
       return publisher
     }
   }
-  
-  //  public static subscript<EnclosingSelf: ObservableObject>(
-  //    _enclosingInstance object: EnclosingSelf,
-  //    wrapped wrappedKeyPath: ReferenceWritableKeyPath<EnclosingSelf, T>,
-  //    storage storageKeyPath: ReferenceWritableKeyPath<EnclosingSelf, Self>
-  //  ) -> T {
-  //    get {
-  //      if object[keyPath: storageKeyPath].objectWillChange == nil {
-  //        object[keyPath: storageKeyPath].objectWillChange = object.objectWillChange as? ObservableObjectPublisher
-  //      }
-  //      return object[keyPath: storageKeyPath].wrappedValue
-  //    }
-  //    set {
-  //      if object[keyPath: storageKeyPath].objectWillChange == nil {
-  //        object[keyPath: storageKeyPath].objectWillChange = object.objectWillChange as? ObservableObjectPublisher
-  //      }
-  //      object[keyPath: storageKeyPath].objectWillChange?.send()
-  //      object[keyPath: storageKeyPath].publisher?.subject.send(newValue)
-  //      object[keyPath: storageKeyPath].wrappedValue = newValue
-  //    }
-  //  }
+
+//  // Observable Publisher
+//
+//  public static subscript<EnclosingSelf: ObservableObject>(
+//    _enclosingInstance object: EnclosingSelf,
+//    wrapped wrappedKeyPath: ReferenceWritableKeyPath<EnclosingSelf, T>,
+//    storage storageKeyPath: ReferenceWritableKeyPath<EnclosingSelf, Fused<T>>
+//  ) -> T {
+//    get {
+//      if object[keyPath: storageKeyPath].objectWillChange == nil {
+//        object[keyPath: storageKeyPath].objectWillChange = object.objectWillChange as? ObservableObjectPublisher
+//      }
+//      return object[keyPath: storageKeyPath].wrappedValue
+//    }
+//    set {
+//      if object[keyPath: storageKeyPath].objectWillChange == nil {
+//        object[keyPath: storageKeyPath].objectWillChange = object.objectWillChange as? ObservableObjectPublisher
+//      }
+//      object[keyPath: storageKeyPath].objectWillChange?.send()
+//      object[keyPath: storageKeyPath].publisher?.subject.send(newValue)
+//      object[keyPath: storageKeyPath].wrappedValue = newValue
+//    }
+//  }
 }

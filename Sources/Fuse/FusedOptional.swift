@@ -1,11 +1,10 @@
 import Combine
 
-public enum FusingOption {
-  case nilFusing
-}
+@available(*, deprecated, renamed: "Fused")
+typealias OptionalFusing = FusedOptional
 
 @propertyWrapper
-public class OptionalFusing<T:Fusable> {
+public class FusedOptional<T:Fusable> {
   var data: T?
   var observerHandle: BindingHandler!
   var server: FuseServer
@@ -14,19 +13,12 @@ public class OptionalFusing<T:Fusable> {
   
   public var didUpdate: ((T?)->())?
   
-  public init(id: Id, server: FuseServer, settingNew: Bool = false) {
+  public init(id: Id?, server: FuseServer, settingNew: Bool = false) {
     self.id = id
     self.server = server
     self.settingNew = settingNew
-    
-    self.observerHandle = self.server.bind(toId: id) { [weak self] (result: ValueResult<T>) in
-        switch result {
-        case .success(let update):
-          self?.callback(update: update)
-        case .failure(let error):
-          print(error.localizedDescription)
-        }
-    }
+        
+    self.observerHandle = listen()
   }
   
   public init(_ data: T, server: FuseServer, settingNew: Bool = false) {
@@ -35,10 +27,26 @@ public class OptionalFusing<T:Fusable> {
     bindToData(data: data)
   }
   
-  public init(_ option: FusingOption, server: FuseServer) {
-    self.server = server
-    self.settingNew = false
-
+  
+  func listen() -> BindingHandler? {
+    guard let id = id else { return nil }
+    
+    return self.server.bind(toId: id) { [weak self] (result: ValueResult<T>) in
+      switch result {
+      case .success(let update):
+        self?.callback(update: update)
+      case .failure(let error):
+        print(error.localizedDescription)
+      }
+    }
+  }
+  
+  func pause() {
+    self.observerHandle.remove()
+  }
+  
+  func start() {
+    self.observerHandle = listen()
   }
   
   func callback(update: T?) {
@@ -56,14 +64,7 @@ public class OptionalFusing<T:Fusable> {
       self.server.set(data, completion: nil)
     }
     
-    self.observerHandle = self.server.bind(toId: data.id) { [weak self] (result: ValueResult<T>) in
-        switch result {
-        case .success(let update):
-          self?.callback(update: update)
-        case .failure(let error):
-          print(error.localizedDescription)
-        }
-    }
+    self.observerHandle = listen()
   }
   
   public var wrappedValue: T? {

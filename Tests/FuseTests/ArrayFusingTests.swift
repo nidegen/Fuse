@@ -12,7 +12,7 @@ import XCTest
 
 
 class TestArrayClass {
-  @ArrayFusing(server: testServer, matching: [Constraint(whereDataField: "name", .isEqual(value: "Tom"))])
+  @FusedArray(server: testServer, matching: [Constraint(whereDataField: "name", .isEqual(value: "Tom"))])
   var testData: [TestData]
 }
 
