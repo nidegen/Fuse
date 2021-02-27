@@ -35,11 +35,11 @@ public class Fused<T:Fusable> {
     }
   }
   
-  func pause() {
+  public func pause() {
     self.observerHandle.remove()
   }
   
-  func start() {
+  public func start() {
     self.observerHandle = listen()
   }
   
