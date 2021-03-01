@@ -18,13 +18,17 @@ public class MockBindingHandler: BindingHandler {
   
   var valueCallback: GetValueCompletion = { result in }
   var arrayCallback: ([Fusable]) -> () = { data in }
+  
+  public var isActive = false
 
   public func remove() {
     server.bindingHandlers.remove(self)
+    isActive = false
   }
   
   fileprivate init(server: MockServer) {
     self.server = server
+    isActive = true
   }
   
   var observedIds: [Id]?

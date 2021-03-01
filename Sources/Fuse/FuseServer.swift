@@ -2,6 +2,7 @@ import Foundation
 
 public protocol BindingHandler: class {
   func remove()
+  var isActive: Bool { get }
 }
 
 public typealias SetCompletion = ((Error?)->())?

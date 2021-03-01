@@ -42,11 +42,15 @@ public class FusedOptional<T:Fusable> {
   }
   
   public func pause() {
-    self.observerHandle.remove()
+    if self.observerHandle.isActive {
+      self.observerHandle.remove()
+    }
   }
   
   public func start() {
-    self.observerHandle = listen()
+    if !self.observerHandle.isActive {
+      self.observerHandle = listen()
+    }
   }
   
   func callback(update: T?) {
