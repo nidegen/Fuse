@@ -30,6 +30,13 @@ public protocol FuseServer: class {
   
   func bind(toId id: Id, ofDataType type: Fusable.Type, completion: @escaping GetValueCompletion) -> BindingHandler
   func bind(dataType type: Fusable.Type, matching constraints: [Constraint], completion: @escaping GetArrayCompletion) -> BindingHandler
+  
+  
+  func increment<T:Fusable>(fusable: T, field: String, value: Int64)
+  
+  func arrayUnion<T:Fusable>(fusable: T, field: String, value: [Any])
+  
+  func arrayRemove<T:Fusable>(fusable: T, field: String, value: [Any])
 }
 
 public extension FuseServer {

@@ -57,6 +57,19 @@ extension MockBindingHandler: Hashable {
 }
 
 public class MockServer: FuseServer {
+  
+  public func increment<T:Fusable>(fusable: T, field: String, value: Int64) {
+    fatalError("not implemented")
+  }
+  
+  public func arrayUnion<T:Fusable>(fusable: T, field: String, value: [Any]) {
+    fatalError("not implemented")
+  }
+  
+  public func arrayRemove<T:Fusable>(fusable: T, field: String, value: [Any]) {
+    fatalError("not implemented")
+  }
+  
   public func update(_ storable: Fusable, completion: SetCompletion) {
     set(storable, merge: false, completion: completion)
   }
