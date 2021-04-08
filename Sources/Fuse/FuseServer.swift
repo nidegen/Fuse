@@ -57,7 +57,7 @@ public extension FuseServer {
     self.update(data as [Fusable], completion: completion)
   }
   
-  func update<T: Fusable>(_ data: T, on fields: [String], completion: SetCompletion) {
+  func update<T: Fusable>(_ data: T, on fields: [String], completion: SetCompletion = nil) {
     self.update(data as Fusable, on: fields, completion: completion)
   }
 
