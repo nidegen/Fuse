@@ -17,7 +17,7 @@ public typealias ArrayCompletion<T: Fusable> = (ArrayResult<T>) -> ()
 
 public enum DataSource { case serverOnly, serverOrCache, cacheOnly }
 
-public protocol FuseServer: class {
+public protocol FuseServer: AnyObject {
   func set(_ storables: [Fusable], merge: Bool, completion: SetCompletion)
   func set(_ storable: Fusable, merge: Bool, completion: SetCompletion)
   func update(_ storables: [Fusable], completion: SetCompletion)
